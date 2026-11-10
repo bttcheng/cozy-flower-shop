@@ -447,14 +447,49 @@ class FlowerShopGame {
   setupWindowScaling() {
     const resizeHandler = () => {
       const container = document.getElementById('game-container');
+      if (!container) return;
       const targetW = 1400;
       const targetH = 788;
-      const scaleX = window.innerWidth / targetW;
-      const scaleY = window.innerHeight / targetH;
-      const scale = Math.min(scaleX, scaleY, 1.2);
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      const scaleX = vw / targetW;
+      const scaleY = vh / targetH;
+      // Tự động scale vừa khít khung màn hình điện thoại (cả ngang lẫn dọc)
+      const scale = Math.min(scaleX, scaleY);
       container.style.transform = `scale(${scale})`;
+
+      // Cảnh báo xoay màn hình ngang khi ở chế độ dọc (portrait) trên điện thoại
+      const isPortrait = vh > vw && vw < 860;
+      let rotNotice = document.getElementById('phone-rotate-notice');
+      if (isPortrait) {
+        if (!rotNotice) {
+          rotNotice = document.createElement('div');
+          rotNotice.id = 'phone-rotate-notice';
+          rotNotice.innerHTML = `
+            <div class="rotate-card">
+              <span class="rotate-icon">🔄📱</span>
+              <strong>Xoay ngang màn hình</strong>
+              <small>Hãy xoay ngang điện thoại để có trải nghiệm cắm hoa và quản lý tiệm trọn vẹn nhất nhé!</small>
+            </div>
+          `;
+          document.body.appendChild(rotNotice);
+        }
+        rotNotice.style.display = 'flex';
+      } else if (rotNotice) {
+        rotNotice.style.display = 'none';
+      }
     };
+
     window.addEventListener('resize', resizeHandler);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(resizeHandler, 200);
+    });
+    if (typeof screen !== 'undefined' && screen.orientation) {
+      screen.orientation.addEventListener('change', () => {
+        setTimeout(resizeHandler, 200);
+      });
+    }
     resizeHandler();
   }
 
