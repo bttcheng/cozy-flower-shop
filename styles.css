@@ -1,0 +1,2593 @@
+/* styles.css - Giao diện Game Quản Lý Tiệm Hoa Chuyên Nghiệp (FLOWER SHOP STORY) */
+
+:root {
+  --bg-wall: #fdf3eb;
+  --wood-dark: #3e1f0c;
+  --wood-med: #73401c;
+  --wood-light: #ab6f3e;
+  --wood-surface: #d8a473;
+  --pink-pastel: #ffccd5;
+  --pink-deep: #ff4d6d;
+  --green-leaf: #1b4332;
+  --green-soft: #40916c;
+  --gold-accent: #f59e0b;
+  --border-thick: 2.8px solid #3e1f0c;
+  --shadow-cozy: 0 8px 24px rgba(62, 31, 12, 0.16);
+  --font-main: 'Nunito', 'Segoe UI', sans-serif;
+  --font-decor: 'Comfortaa', cursive;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #200f07;
+  font-family: var(--font-main);
+  color: #3e1f0c;
+}
+
+#game-scale-wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #351c10 0%, #150a05 100%);
+  overflow: hidden;
+}
+
+#game-container {
+  width: 1400px;
+  height: 788px;
+  position: relative;
+  background: var(--bg-wall);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85);
+  border-radius: 14px;
+  border: 4px solid #351a0a;
+  transform-origin: center center;
+}
+
+/* NỀN TIỆM HOA HOẠT HÌNH COZY */
+.shop-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.brick-pattern {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(#ebd0c5 15%, transparent 16%),
+    radial-gradient(#e4c6ba 15%, transparent 16%);
+  background-size: 55px 55px;
+  background-position: 0 0, 27px 27px;
+  opacity: 0.35;
+}
+
+.sunbeam {
+  position: absolute;
+  top: -60px;
+  left: 380px;
+  width: 500px;
+  height: 750px;
+  background: linear-gradient(135deg, rgba(255, 246, 204, 0.32) 0%, rgba(255, 246, 204, 0) 80%);
+  transform: rotate(18deg);
+}
+
+.shop-window {
+  position: absolute;
+  top: 55px;
+  right: 55px;
+  width: 165px;
+  height: 140px;
+  background: #cbf3f0;
+  border: 6px solid var(--wood-med);
+  border-radius: 85px 85px 10px 10px;
+  box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.85);
+  overflow: hidden;
+}
+.window-pane {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.window-pane::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--wood-med);
+  transform: translateX(-50%);
+}
+.window-pane::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--wood-med);
+  transform: translateY(-50%);
+}
+
+.hanging-plant {
+  position: absolute;
+  top: 55px;
+  width: 50px;
+  height: 90px;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 80"><path d="M20 0 L20 30" stroke="%2373401c" stroke-width="2.5"/><ellipse cx="20" cy="35" rx="16" ry="8" fill="%23ab6f3e"/><path d="M12 40 Q6 62 10 78 Q18 68 18 40" fill="%231b4332"/><path d="M24 40 Q30 65 24 82 Q18 64 20 40" fill="%232d6a4f"/><path d="M18 42 Q20 70 18 84 Q14 65 18 42" fill="%2340916c"/></svg>') no-repeat center;
+  background-size: contain;
+}
+.plant-1 { left: 40px; }
+.plant-2 { left: 360px; }
+
+/* 1. HUD THÔNG TIN TRÊN ĐỈNH */
+#top-hud {
+  position: relative;
+  z-index: 30;
+  height: 58px;
+  background: #fff8f0;
+  border-bottom: 3px solid var(--wood-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 4px 14px rgba(62, 31, 12, 0.1);
+}
+
+.hud-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.store-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #ffccd5;
+  padding: 4px 14px 4px 6px;
+  border-radius: 28px;
+  border: var(--border-thick);
+}
+.store-logo {
+  width: 36px;
+  height: 36px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.store-info { display: flex; flex-direction: column; }
+.store-name {
+  font-family: var(--font-decor);
+  font-weight: 700;
+  font-size: 15px;
+  color: #590d22;
+}
+.store-level {
+  font-size: 11px;
+  font-weight: 800;
+  color: #800f2f;
+}
+
+.hud-stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 2px solid #d8a473;
+}
+.pill-icon { font-size: 18px; }
+.pill-content { display: flex; flex-direction: column; }
+.pill-title { font-weight: 800; font-size: 13px; color: var(--wood-dark); }
+.pill-sub { font-size: 11px; color: #c9184a; font-weight: 800; }
+
+.hud-center {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.currency-card {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff9db;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: var(--border-thick);
+}
+.currency-icon {
+  font-size: 20px;
+  animation: pulse-coin 2.2s infinite ease-in-out;
+}
+@keyframes pulse-coin {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15) rotate(6deg); }
+}
+.currency-amount { font-weight: 900; font-size: 18px; color: #7f4f24; }
+.mini-plus-btn {
+  background: #2d6a4f;
+  color: #fff;
+  border: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-weight: 900;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mini-plus-btn:hover { background: #1b4332; transform: scale(1.1); }
+
+.reputation-card {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 2px solid #ffd166;
+}
+.rep-icon { font-size: 16px; }
+.rep-score { font-weight: 800; font-size: 14px; color: #d48b00; }
+.rep-stars { color: #ffb703; letter-spacing: 1px; font-size: 12px; }
+
+.order-counter-card {
+  background: #e8f5e9;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 2px solid #81c784;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #2e7d32;
+}
+.counter-value {
+  background: #2e7d32;
+  color: #fff;
+  padding: 1px 8px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+
+.hud-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-btn {
+  background: #fff;
+  border: var(--border-thick);
+  border-radius: 12px;
+  padding: 5px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-family: var(--font-main);
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--wood-dark);
+  box-shadow: 0 3px 0 var(--wood-dark);
+  transition: all 0.12s;
+}
+.hud-btn:hover {
+  background: #fff3e6;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 var(--wood-dark);
+}
+.hud-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--wood-dark);
+}
+
+/* BĂNG BẢN TIN TRẠNG THÁI TIỆM */
+#event-ticker {
+  position: relative;
+  z-index: 25;
+  height: 26px;
+  background: #ffe3e0;
+  border-bottom: 2px dashed #e76f51;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  font-size: 12px;
+  color: #9d0208;
+}
+.ticker-tag { font-weight: 900; margin-right: 8px; }
+.ticker-text { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* 2. KHÔNG GIAN GAME CHÍNH (PLAYFIELD) */
+#main-playfield {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  height: calc(100% - 58px - 26px - 280px);
+}
+
+/* A. KHU VỰC QUẦY ĐÓN KHÁCH & BẢNG KẸP ĐƠN HÀNG CỐ ĐỊNH */
+#customer-area {
+  position: relative;
+  border-right: 3px solid var(--wood-med);
+  background: rgba(255, 245, 238, 0.75);
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px;
+  overflow: hidden;
+}
+
+/* BIỂN HIỆU TIỆM HOA (LẬT ĐƯỢC) */
+.shop-signboard-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.shop-signboard {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 18px;
+  border: var(--border-thick);
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: 0 3px 0 var(--wood-dark);
+}
+.shop-signboard.preparing {
+  background: #fef08a;
+  color: #854d0e;
+  border-color: #854d0e;
+}
+.shop-signboard.open {
+  background: #bbf7d0;
+  color: #166534;
+  border-color: #166534;
+}
+.shop-signboard.closing {
+  background: #ede9fe;
+  color: #4c1d95;
+  border-color: #6d28d9;
+}
+
+/* NÚT LẬT BIỂN MỞ CỬA BÁN */
+.btn-open-shop-pulse {
+  background: #ef4444;
+  color: #ffffff;
+  border: var(--border-thick);
+  border-radius: 12px;
+  padding: 5px 14px;
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #7f1d1d;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: pulse-open-btn 1.4s infinite ease-in-out;
+}
+@keyframes pulse-open-btn {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.btn-open-shop-pulse:hover { background: #dc2626; }
+
+/* BẢNG KẸP GỖ ĐƠN HÀNG CỐ ĐỊNH (ORDER CLIPBOARD STAND) */
+#order-clipboard-stand {
+  position: relative;
+  width: 100%;
+  height: 266px;
+  background: #fffdfa;
+  border: 3px solid #73401c;
+  border-radius: 14px;
+  box-shadow: 0 10px 20px rgba(62, 31, 12, 0.18);
+  padding: 9px 11px;
+  display: flex;
+  flex-direction: column;
+}
+
+.clipboard-clamp {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70px;
+  height: 16px;
+  background: linear-gradient(to bottom, #f59e0b, #b45309);
+  border: 2px solid #3e1f0c;
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+  z-index: 5;
+}
+
+/* 1. Giao diện giai đoạn Soạn đồ sáng sớm */
+.clipboard-prep-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 5px;
+}
+.prep-card-header {
+  border-bottom: 2px dashed #d8a473;
+  padding-bottom: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.prep-badge {
+  font-family: var(--font-decor);
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #73401c;
+}
+.prep-day-pill {
+  background: #ffedd5;
+  border: 1.5px solid #ea580c;
+  color: #9a3412;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 1px 8px;
+  border-radius: 10px;
+}
+.prep-checklist-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* THÔNG BÁO HOA MỞ KHÓA HÔM NAY */
+.prep-unlock-notice {
+  background: linear-gradient(135deg, #fff1f2 0%, #fef3c7 100%);
+  border: 1.8px solid #f59e0b;
+  border-radius: 9px;
+  padding: 5px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.prep-unlock-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.prep-unlock-title {
+  font-size: 11px;
+  font-weight: 900;
+  color: #9f1239;
+}
+.prep-unlock-shop-btn {
+  background: #d97706 !important;
+  padding: 2px 7px !important;
+  font-size: 10px !important;
+}
+.prep-unlock-flowers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.prep-unlock-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #ffffff;
+  border: 1.5px solid #86efac;
+  border-radius: 12px;
+  padding: 1px 7px 1px 4px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #166534;
+}
+.prep-unlock-chip.purchasable {
+  border-color: #fbbf24;
+  color: #92400e;
+  background: #fffbeb;
+}
+.prep-chip-svg {
+  width: 16px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.prep-chip-svg svg {
+  width: 100%;
+  height: 100%;
+}
+.prep-unlock-desc {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #78350f;
+  line-height: 1.25;
+}
+
+.prep-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #fff8f0;
+  border: 1.5px solid #fed7aa;
+  border-radius: 8px;
+  padding: 3px 7px;
+}
+.prep-icon { font-size: 16px; }
+.prep-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.prep-info strong { font-size: 11px; color: #3e1f0c; }
+.prep-info small { font-size: 9.5px; color: #78350f; font-weight: 700; }
+.prep-quick-btn {
+  background: #2d6a4f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.prep-quick-btn:hover { opacity: 0.9; }
+.prep-check { font-size: 13px; }
+.prep-hint-box {
+  background: #fef08a;
+  border: 1.5px dashed #ca8a04;
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #854d0e;
+  text-align: center;
+}
+
+/* 2. Giao diện Đơn hàng rõ ràng khi mở bán */
+.clipboard-active-order-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 5px;
+}
+
+.active-ticket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px dashed #fed7aa;
+  padding-bottom: 4px;
+}
+.ticket-customer-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.cust-avatar-thumb { font-size: 20px; }
+.cust-header-text { display: flex; align-items: center; gap: 6px; }
+.ticket-cust-name {
+  font-family: var(--font-decor);
+  font-size: 12.5px;
+  font-weight: 900;
+  color: #3e1f0c;
+}
+.ticket-style-pill {
+  font-size: 10px;
+  font-weight: 800;
+  background: #ffccd5;
+  color: #9f1239;
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+.ticket-price-box {
+  background: #fef3c7;
+  border: 1.5px solid #f59e0b;
+  border-radius: 12px;
+  padding: 2px 8px;
+}
+.ticket-price {
+  font-size: 13px;
+  font-weight: 900;
+  color: #b45309;
+}
+
+.ticket-patience-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ticket-patience-track {
+  flex: 1;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  border: 1.5px solid #cbd5e1;
+  overflow: hidden;
+}
+.ticket-patience-bar {
+  height: 100%;
+  background: #22c55e;
+  transition: width 0.3s linear, background-color 0.3s;
+}
+.ticket-patience-bar.warning { background: #f59e0b; }
+.ticket-patience-bar.danger { background: #ef4444; animation: blink-danger 0.5s infinite alternate; }
+@keyframes blink-danger { from { opacity: 1; } to { opacity: 0.4; } }
+.ticket-patience-txt {
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.ticket-req-flowers-list {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.ticket-flower-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #fff5f5;
+  border: 1.5px solid #fecdd3;
+  border-radius: 8px;
+  padding: 2px 7px;
+}
+.ticket-flw-svg {
+  width: 26px;
+  height: 32px;
+  flex-shrink: 0;
+}
+.ticket-flw-details {
+  display: flex;
+  flex-direction: column;
+}
+.ticket-flw-details span {
+  font-size: 11px;
+  font-weight: 800;
+  color: #3e1f0c;
+}
+.ticket-flw-details strong {
+  font-size: 11px;
+  font-weight: 900;
+  color: #e11d48;
+}
+
+.ticket-req-materials-box {
+  display: flex;
+  gap: 8px;
+}
+.ticket-mat-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 3px 6px;
+}
+.ticket-mat-preview {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.ticket-mat-preview svg { width: 100%; height: 100%; }
+.ticket-mat-desc { display: flex; flex-direction: column; }
+.ticket-mat-desc small { font-size: 9.5px; color: #64748b; font-weight: 700; }
+.ticket-mat-desc strong { font-size: 10.5px; color: #1e293b; font-weight: 800; }
+
+.ticket-card-quote {
+  font-size: 10.5px;
+  font-style: italic;
+  font-weight: 700;
+  color: #be123c;
+  background: #fff1f2;
+  border-left: 3px solid #f43f5e;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.ticket-style-pill.vip-pill {
+  background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+  color: #1e3a5f;
+  border: 1px solid #d97706;
+}
+
+.clipboard-waiting-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #1e3a5f;
+  text-align: center;
+  padding: 10px;
+  gap: 5px;
+}
+.waiting-icon { font-size: 34px; }
+.waiting-title { font-size: 13.5px; font-weight: 900; color: #1e3a5f; }
+.waiting-sub { font-size: 11px; color: #64748b; font-weight: 700; }
+
+/* QUẦY GỖ & HÀNG ĐỢI NHÂN VẬT CHIBI HOẠT HÌNH */
+.counter-surface-wood {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.customer-queue-area {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.chibi-customer-stand {
+  position: absolute;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+}
+.chibi-customer-stand.pos-0 { left: 16px; z-index: 6; transform: scale(1); }
+.chibi-customer-stand.pos-1 { left: 145px; z-index: 4; transform: scale(0.88); opacity: 0.9; }
+.chibi-customer-stand.pos-2 { left: 245px; z-index: 3; transform: scale(0.78); opacity: 0.78; }
+.chibi-customer-stand.pos-3 { left: 325px; z-index: 2; transform: scale(0.70); opacity: 0.65; }
+
+.chibi-customer-stand.is-vip-customer .chibi-character-wrap {
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.55));
+}
+
+.chibi-character-wrap {
+  width: 110px;
+  height: 125px;
+  animation: chibi-breath 2.5s infinite ease-in-out;
+}
+@keyframes chibi-breath {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.chibi-character { width: 100%; height: 100%; }
+
+.chibi-mood-bubble {
+  position: absolute;
+  top: -15px;
+  background: #fff;
+  border: 2px solid #3e1f0c;
+  border-radius: 12px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  white-space: nowrap;
+}
+.chibi-mood-bubble.vip-bubble {
+  background: linear-gradient(135deg, #fef08a 0%, #fde68a 100%);
+  border-color: #b45309;
+  color: #1e3a5f;
+}
+
+.counter-front-bar {
+  height: 28px;
+  background: linear-gradient(to bottom, #ab6f3e, #73401c);
+  border-top: 3px solid #3e1f0c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fef3c7;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+/* B. KỆ HOA GỖ 2 TẦNG (CHỨA ĐỦ 18 LOÀI HOA THEO CẤP BẬC) */
+#flower-shelf-area {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 14px;
+}
+.shelf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.shelf-title {
+  font-family: var(--font-decor);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--wood-dark);
+}
+.shelf-guide-pill {
+  font-size: 11px;
+  font-weight: 800;
+  color: #166534;
+  background: #dcfce7;
+  border: 1.5px solid #86efac;
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+.wooden-shelf-rack {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  margin-top: 4px;
+}
+.shelf-tier {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.wood-board {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 16px;
+  background: linear-gradient(to bottom, #ab6f3e 0%, #73401c 100%);
+  border: 2.5px solid #3e1f0c;
+  border-radius: 5px;
+  box-shadow: 0 8px 16px rgba(62, 31, 12, 0.25);
+  z-index: 1;
+}
+
+.flower-buckets-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2px 6px 2px;
+}
+
+/* XÔ HOA TRÊN KỆ (RỘNG 95PX VỪA VẶN 9 XÔ MỖI TẦNG) */
+.big-flower-bucket {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.16s ease-out;
+  position: relative;
+  width: 95px;
+}
+.big-flower-bucket:hover { transform: translateY(-8px); }
+.big-flower-bucket:active { transform: translateY(2px) scale(0.95); }
+.big-flower-bucket.empty-stock { filter: grayscale(0.85); opacity: 0.55; }
+
+/* HOA BỊ KHÓA - HIỆU ỨNG MỜ GRAYSCALE + Ổ KHÓA & NHÃN NGÀY MỞ KHÓA */
+.big-flower-bucket.locked-bucket {
+  cursor: not-allowed;
+}
+.big-flower-bucket.locked-bucket.purchasable-bucket {
+  cursor: pointer;
+}
+.big-flower-bucket.locked-bucket:hover {
+  transform: translateY(-2px);
+}
+.flower-bloom-frame.locked-bloom {
+  position: relative;
+}
+.flower-art-locked {
+  width: 100%;
+  height: 100%;
+  filter: grayscale(1) blur(1.5px);
+  opacity: 0.35;
+  transition: opacity 0.2s;
+}
+.big-flower-bucket.purchasable-bucket .flower-art-locked {
+  filter: grayscale(0.75) blur(1px);
+  opacity: 0.55;
+}
+.lock-overlay-badge {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  background: rgba(254, 243, 199, 0.94);
+  border: 2px solid #78350f;
+  border-radius: 10px;
+  padding: 3px 7px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.28);
+}
+.lock-overlay-badge.purchasable {
+  background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+  border-color: #b45309;
+  animation: pulse-purchasable 1.8s infinite ease-in-out;
+}
+@keyframes pulse-purchasable {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.07); }
+}
+.lock-icon { font-size: 15px; line-height: 1.1; }
+.lock-level-text { font-size: 9.5px; font-weight: 900; color: #78350f; white-space: nowrap; }
+
+.bucket-zinc-pot.locked-pot {
+  background: linear-gradient(to bottom, #94a3b8 0%, #64748b 100%);
+  border-color: #475569;
+}
+.bucket-zinc-pot.locked-pot .bucket-name-plate {
+  color: #f1f5f9;
+}
+.bucket-zinc-pot.locked-pot.purchasable-pot {
+  background: linear-gradient(to bottom, #f59e0b 0%, #b45309 100%);
+  border-color: #78350f;
+}
+
+.flower-bloom-frame {
+  width: 82px;
+  height: 105px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+.big-flower-bucket:not(.locked-bucket):hover .flower-bloom-frame {
+  transform: scale(1.12) rotate(3deg);
+}
+.flower-art {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+
+.bucket-zinc-pot {
+  width: 72px;
+  height: 30px;
+  background: linear-gradient(to bottom, #f1f5f9 0%, #cbd5e1 100%);
+  border: 2px solid #64748b;
+  border-radius: 4px 4px 12px 12px;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.9), 0 4px 8px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-top: -12px;
+}
+.bucket-name-plate {
+  font-size: 9.5px;
+  font-weight: 900;
+  color: #1e293b;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 62px;
+}
+.bucket-stock-badge-large {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #2d6a4f;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 12px;
+  border: 1.5px solid #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.bucket-stock-badge-large.low {
+  background: #e63946;
+  animation: pulse-stock 0.8s infinite alternate;
+}
+@keyframes pulse-stock { from { transform: scale(1); } to { transform: scale(1.2); } }
+
+/* 3. BÀN CẮM HOA RỘNG & 3 TAB NGUYÊN LIỆU (FOOTER) */
+#workbench-area {
+  position: relative;
+  z-index: 20;
+  height: 280px;
+  background: #ede0d4;
+  border-top: 4px solid var(--wood-dark);
+  box-shadow: 0 -10px 30px rgba(62, 31, 12, 0.2);
+  display: grid;
+  grid-template-columns: 105px 1fr 390px 240px;
+  padding: 10px 14px;
+  gap: 12px;
+}
+
+.workbench-tools-tray {
+  background: #d8a473;
+  border: var(--border-thick);
+  border-radius: 12px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tray-title {
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--wood-dark);
+  text-align: center;
+  text-transform: uppercase;
+}
+.tool-btn {
+  background: #fff8f0;
+  border: 2px solid var(--wood-med);
+  border-radius: 10px;
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--wood-dark);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.tool-btn:hover { background: #ffe8d6; transform: translateY(-2px); }
+.tool-btn.active {
+  background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+  border-color: #b45309;
+  color: #1e3a5f;
+  box-shadow: 0 0 0 2.5px #f59e0b, 0 3px 0 #78350f;
+  transform: translateY(-2px);
+}
+.tool-btn.danger { color: #9d0208; border-color: #d90429; }
+.tool-btn.danger:hover { background: #ffe3e3; }
+.tool-icon { font-size: 20px; }
+
+/* BÀN GỖ & BÓ HOA TRUNG TÂM */
+.workbench-workspace-center { display: flex; flex-direction: column; }
+.wooden-tabletop {
+  flex: 1;
+  background: #ab6f3e;
+  border: var(--border-thick);
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+#bouquet-workspace {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #fffdf9 0%, #fdf3eb 100%);
+  border-radius: 10px;
+  border: 2px dashed #73401c;
+}
+#bouquet-workspace.shears-active {
+  border-color: #f59e0b;
+  background: radial-gradient(circle at center, #fffbeb 0%, #fef3c7 100%);
+  cursor: crosshair;
+}
+
+.container-style-switcher {
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  z-index: 42;
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid #d8a473;
+  border-radius: 14px;
+  padding: 2px;
+  box-shadow: 0 2px 6px rgba(62, 31, 12, 0.12);
+}
+.style-pill-btn {
+  background: transparent;
+  border: none;
+  border-radius: 11px;
+  padding: 3px 8px;
+  font-family: var(--font-main);
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #1e3a5f;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.style-pill-btn.active {
+  background: #ffccd5;
+  color: #590d22;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.active-tool-banner {
+  position: absolute;
+  top: 7px;
+  left: 8px;
+  z-index: 42;
+  background: #fef08a;
+  border: 1.8px solid #d97706;
+  border-radius: 12px;
+  padding: 3px 9px;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #1e3a5f;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  pointer-events: none;
+}
+
+.flower-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+#bouquet-wrapper-back { z-index: 4; }
+#bouquet-greenery-layer { z-index: 6; }
+#bouquet-flowers-layer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+}
+#bouquet-wrapper-front { z-index: 25; }
+#bouquet-ribbon-layer { z-index: 30; }
+#bouquet-card-layer { z-index: 35; }
+
+.crafted-flower-stem-big {
+  position: absolute;
+  width: 88px;
+  height: 120px;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform var(--stem-trans-dur, 0.3s) cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s;
+  filter: drop-shadow(0 4px 6px rgba(62, 31, 12, 0.14));
+}
+#bouquet-workspace.shears-active .crafted-flower-stem-big:hover {
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.85));
+  cursor: crosshair;
+}
+.crafted-flower-stem-big.just-snipped {
+  animation: stem-snip-pop 0.35s ease-out;
+}
+@keyframes stem-snip-pop {
+  0% { filter: drop-shadow(0 0 12px #fbbf24); }
+  50% { margin-top: -8px; }
+  100% { margin-top: 0; }
+}
+.stem-status-dot {
+  position: absolute;
+  top: 4px;
+  right: 12px;
+  font-size: 11px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+#bouquet-workspace.shears-active .stem-status-dot.untrimmed {
+  opacity: 1;
+}
+.stem-status-dot.trimmed {
+  opacity: 0.9;
+}
+
+#empty-workspace-hint {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  z-index: 20;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 1px dashed #cbd5e1;
+  pointer-events: none;
+}
+.hint-icon { font-size: 18px; }
+.hint-text { font-weight: 900; font-size: 11.5px; color: var(--wood-dark); }
+.hint-sub { font-size: 10px; color: var(--wood-med); font-weight: 700; }
+
+#workbench-controls-bar {
+  height: 38px;
+  background: #ffffff;
+  border-top: 2px solid #d8a473;
+  border-radius: 0 0 8px 8px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 8px;
+  overflow-x: auto;
+}
+.bar-title { font-size: 11px; font-weight: 900; color: var(--wood-dark); flex-shrink: 0; }
+#workbench-flower-chips { display: flex; align-items: center; gap: 6px; flex: 1; }
+
+.flower-chip-control {
+  background: #fff8f0;
+  border: 1.5px solid #d8a473;
+  border-radius: 14px;
+  padding: 2px 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #3e1f0c;
+  white-space: nowrap;
+}
+.chip-btn-minus, .chip-btn-plus {
+  background: #e9ecef;
+  border: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chip-btn-minus:hover { background: #ffccd5; color: #c9184a; }
+.chip-btn-plus:hover { background: #d8f3dc; color: #2d6a4f; }
+.empty-note { font-size: 11px; color: #94a3b8; font-style: italic; }
+
+/* 3 TAB LỚN VẬT LIỆU */
+.decor-selection-container {
+  background: #d8a473;
+  border: var(--border-thick);
+  border-radius: 14px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+.decor-tabs-header { display: flex; gap: 6px; margin-bottom: 8px; }
+.decor-tab-btn {
+  flex: 1;
+  background: #ede0d4;
+  border: 2px solid var(--wood-med);
+  border-radius: 8px;
+  padding: 6px 4px;
+  font-size: 11.5px;
+  font-weight: 900;
+  color: var(--wood-dark);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.decor-tab-btn.active {
+  background: #f59e0b;
+  border-color: var(--wood-dark);
+  box-shadow: 0 2px 0 var(--wood-dark);
+}
+
+.decor-tab-view { display: none; flex: 1; overflow-y: auto; }
+.decor-tab-view.active { display: block; }
+
+.decor-items-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.decor-visual-card {
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 6px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  height: 82px;
+}
+.decor-visual-card:hover { transform: translateY(-2px); border-color: #f59e0b; }
+.decor-visual-card.selected {
+  border-color: #e11d48;
+  background: #fff1f2;
+  box-shadow: 0 0 0 2.5px #e11d48;
+}
+.decor-thumb-img {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.decor-thumb-img svg { width: 100%; height: 100%; }
+.decor-card-name {
+  font-size: 10px;
+  font-weight: 800;
+  color: #334155;
+  text-align: center;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+/* BẢNG CHẤM ĐIỂM TIÊU CHÍ & GIAO THU TIỀN */
+.action-deliver-container { display: flex; flex-direction: column; gap: 8px; }
+.scoring-card {
+  background: #ffffff;
+  border: var(--border-thick);
+  border-radius: 12px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: var(--shadow-cozy);
+}
+.score-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1.5px dashed #d8a473;
+  padding-bottom: 3px;
+}
+.score-title { font-size: 11.5px; font-weight: 900; color: var(--wood-dark); }
+.score-percent { font-size: 15px; font-weight: 900; color: #166534; }
+
+.score-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #475569;
+}
+.score-row { display: flex; align-items: center; justify-content: space-between; }
+.score-row.passed { color: #166534; font-weight: 800; }
+.score-row.passed .dot { color: #166534; }
+.score-row.failed { color: #e11d48; }
+
+.score-feedback {
+  font-size: 10px;
+  font-weight: 800;
+  color: #be123c;
+  background: #fff1f2;
+  padding: 3px 6px;
+  border-radius: 6px;
+  line-height: 1.2;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1.5px dashed #d8a473;
+  padding-top: 4px;
+}
+.price-label { font-size: 11px; font-weight: 800; color: #64748b; }
+.price-val { font-size: 16px; font-weight: 900; color: #b45309; }
+
+.btn-deliver-order {
+  flex: 1;
+  background: #e11d48;
+  border: var(--border-thick);
+  border-radius: 12px;
+  color: #ffffff;
+  font-family: var(--font-main);
+  font-weight: 900;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 5px 0 #881337;
+  letter-spacing: 0.5px;
+  transition: all 0.15s;
+}
+.btn-deliver-order:hover { background: #be123c; transform: translateY(-2px); box-shadow: 0 7px 0 #881337; }
+.btn-deliver-order:active { transform: translateY(2px); box-shadow: 0 2px 0 #881337; }
+
+/* FX LAYER */
+#fx-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 60;
+}
+.flying-flower-fx {
+  position: absolute;
+  width: 60px;
+  height: 80px;
+  pointer-events: none;
+  animation: fly-to-table 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+@keyframes fly-to-table {
+  0% { transform: scale(1) rotate(0deg); opacity: 1; }
+  50% { transform: scale(1.3) rotate(15deg); opacity: 1; }
+  100% { transform: translate(var(--dest-x, 0), var(--dest-y, 0)) scale(0.9) rotate(0deg); opacity: 0; }
+}
+
+.coin-particle {
+  position: absolute;
+  font-size: 24px;
+  animation: fly-coin 1s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+@keyframes fly-coin {
+  0% { transform: translate(0, 0) scale(0.6); opacity: 1; }
+  50% { transform: translate(-20px, -90px) scale(1.3); opacity: 1; }
+  100% { transform: translate(-120px, -220px) scale(0.8); opacity: 0; }
+}
+
+.heart-particle {
+  position: absolute;
+  font-size: 22px;
+  animation: fly-heart 1.3s ease-out forwards;
+}
+@keyframes fly-heart {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+  100% { transform: translate(var(--tx, 0), -140px) scale(1.4); opacity: 0; }
+}
+
+.snip-leaf-particle {
+  position: absolute;
+  font-size: 18px;
+  pointer-events: none;
+  animation: fly-snip-leaf 0.65s ease-out forwards;
+}
+@keyframes fly-snip-leaf {
+  0% { transform: translate(0, 0) scale(0.8) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--sx, 20px), var(--sy, 40px)) scale(1.1) rotate(var(--sr, 120deg)); opacity: 0; }
+}
+
+.trim-bonus-badge {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #4ade80;
+  border-radius: 8px;
+  padding: 1px 5px;
+  font-size: 9.5px;
+  font-weight: 900;
+  margin-left: 4px;
+}
+
+/* TOAST */
+#game-toast {
+  position: absolute;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: #1e293b;
+  color: #ffffff;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+#game-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* MODALS */
+.game-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 90;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.game-modal.active { display: flex; }
+.modal-backdrop {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: rgba(32, 15, 7, 0.7);
+  backdrop-filter: blur(3px);
+}
+.modal-dialog {
+  position: relative;
+  z-index: 2;
+  background: #fff8f0;
+  border: var(--border-thick);
+  border-radius: 18px;
+  width: 620px;
+  max-height: 540px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+}
+.modal-header {
+  padding: 14px 18px;
+  border-bottom: 2px dashed #d8a473;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.modal-header h3 { font-family: var(--font-decor); font-size: 17px; color: var(--wood-dark); }
+.modal-close-btn { background: none; border: none; font-size: 26px; font-weight: 900; color: var(--wood-med); cursor: pointer; }
+
+.modal-body { padding: 16px 18px; overflow-y: auto; flex: 1; }
+
+/* MENU NÂNG CẤP ĐA CẤP ĐỘ (TONE PASTEL ẤM ÁP + CHỮ XANH NAVY) */
+.upgrade-dialog {
+  width: 680px;
+  max-height: 590px;
+  background: #fff9f2;
+  color: #1e3a5f;
+}
+.upgrade-dialog .modal-header h3 {
+  color: #1e3a5f;
+}
+.upgrade-summary-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: linear-gradient(135deg, #ffe8ec 0%, #fef3c7 100%);
+  border: 2px solid #f4acb7;
+  border-radius: 12px;
+  padding: 8px 14px;
+  margin-bottom: 12px;
+}
+.upg-sum-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #1e3a5f;
+}
+.upg-sum-pill strong {
+  background: #ffffff;
+  border: 1.5px solid #d8a473;
+  border-radius: 10px;
+  padding: 2px 10px;
+  color: #1e3a5f;
+  font-weight: 900;
+}
+
+.upgrade-list { display: flex; flex-direction: column; gap: 10px; }
+.upgrade-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 2px solid #ead1be;
+  border-radius: 14px;
+  padding: 11px 14px;
+  box-shadow: 0 3px 10px rgba(30, 58, 95, 0.06);
+  transition: transform 0.15s, border-color 0.15s;
+}
+.upgrade-card:hover {
+  border-color: #f4acb7;
+  transform: translateY(-1px);
+}
+.upgrade-card.purchased {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+.upg-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ffe4e6 0%, #fef3c7 100%);
+  border: 2px solid #f4acb7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.upg-icon { font-size: 28px; }
+.upg-info { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.upg-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.upg-name {
+  font-weight: 900;
+  font-size: 14.5px;
+  color: #1e3a5f;
+}
+.upg-level-badge {
+  background: #e0f2fe;
+  color: #1e3a5f;
+  border: 1.5px solid #7dd3fc;
+  border-radius: 10px;
+  padding: 1px 8px;
+  font-size: 10.5px;
+  font-weight: 900;
+}
+.upg-level-badge.maxed {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #4ade80;
+}
+.upg-pips-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.upg-pip {
+  width: 18px;
+  height: 6px;
+  border-radius: 4px;
+  background: #e2e8f0;
+  border: 1px solid #cbd5e1;
+}
+.upg-pip.active {
+  background: #f59e0b;
+  border-color: #b45309;
+}
+.upg-cat-tag {
+  margin-left: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #475569;
+  background: #fdf2f8;
+  padding: 1px 7px;
+  border-radius: 8px;
+}
+.upg-desc {
+  font-size: 11.5px;
+  color: #334155;
+  font-weight: 600;
+}
+.upg-effects-box {
+  background: #fff9f2;
+  border: 1.5px dashed #ead1be;
+  border-radius: 8px;
+  padding: 5px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: #1e3a5f;
+}
+.upg-eff-line.next {
+  color: #0369a1;
+  font-weight: 700;
+}
+.upg-eff-line.maxed-note {
+  color: #15803d;
+  font-weight: 800;
+}
+.upg-action-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+.upg-btn {
+  min-width: 106px;
+  background: linear-gradient(to bottom, #ffd166, #f59e0b);
+  border: 2px solid #1e3a5f;
+  border-radius: 11px;
+  padding: 7px 12px;
+  color: #1e3a5f;
+  font-family: var(--font-main);
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  box-shadow: 0 3px 0 #1e3a5f;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.upg-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 #1e3a5f;
+}
+.upg-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 2px 0 #1e3a5f;
+}
+.upg-btn.insufficient {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #64748b;
+  box-shadow: 0 2px 0 #94a3b8;
+}
+.upg-btn.maxed-btn {
+  background: #dcfce7;
+  border-color: #4ade80;
+  color: #166534;
+  box-shadow: none;
+  cursor: default;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+.upg-btn-label { font-size: 11px; }
+.upg-btn-cost { font-size: 13.5px; }
+
+.restock-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.restock-item {
+  background: #ffffff;
+  border: 2px solid #d8a473;
+  border-radius: 10px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.restock-item.unlockable-item {
+  background: #fffbeb;
+  border-color: #f59e0b;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.18);
+}
+.restock-item.locked-restock-item {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  opacity: 0.72;
+}
+.restock-art { width: 48px; height: 48px; }
+.restock-art.locked-art { filter: grayscale(1); opacity: 0.5; }
+.restock-name { font-size: 11.5px; font-weight: 900; text-align: center; color: #334155; }
+.restock-stock { font-size: 11px; color: #64748b; font-weight: 700; text-align: center; }
+.restock-stock.unlockable-tag { color: #b45309; font-weight: 800; }
+.restock-btn {
+  width: 100%;
+  background: #2d6a4f;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px;
+  font-weight: 900;
+  font-size: 11px;
+  cursor: pointer;
+}
+.restock-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+.restock-btn.restock-unlock-btn {
+  background: linear-gradient(to bottom, #f59e0b, #d97706);
+  color: #fff;
+  box-shadow: 0 2px 0 #92400e;
+}
+.restock-btn.restock-unlock-btn:hover {
+  background: linear-gradient(to bottom, #fbbf24, #b45309);
+}
+
+.btn-primary-large {
+  width: 100%;
+  background: #e11d48;
+  border: var(--border-thick);
+  color: #fff;
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 900;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #881337;
+}
+
+.tutorial-steps { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+.t-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #fff;
+  border: 1.5px solid #d8a473;
+  border-radius: 10px;
+  padding: 10px;
+}
+.t-icon { font-size: 22px; }
+.t-info h4 { font-size: 13.5px; color: var(--wood-dark); margin-bottom: 3px; }
+.t-info p { font-size: 12px; color: #475569; line-height: 1.4; }
+
+.day-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.stat-box {
+  background: #fff;
+  border: 2px solid #d8a473;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sb-label { font-size: 11px; color: #64748b; font-weight: 800; }
+.sb-val { font-size: 18px; font-weight: 900; color: var(--wood-dark); }
+.sb-val.highlight { color: #b45309; }
+.day-next-preview {
+  background: #ffccd5;
+  border: 1.5px dashed #c9184a;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #800f2f;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.day-end-actions {
+  display: flex;
+  gap: 10px;
+}
+.btn-secondary-large {
+  flex: 0.9;
+  background: #f1f5f9;
+  border: 2.5px solid #1e3a5f;
+  color: #1e3a5f;
+  font-family: var(--font-main);
+  font-size: 13px;
+  font-weight: 900;
+  padding: 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #1e3a5f;
+}
+.btn-secondary-large:hover { background: #e2e8f0; }
+
+/* MÀN HÌNH SOẠN HÀNG BUỔI SÁNG (TÁCH BIỆT HOÀN TOÀN) */
+#morning-prep-screen {
+  position: relative;
+  z-index: 15;
+  flex: 1;
+  height: calc(100% - 58px - 26px);
+  padding: 14px 18px;
+  display: flex;
+  background: rgba(255, 248, 240, 0.86);
+}
+.morning-prep-grid {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 345px 1fr 330px;
+  gap: 14px;
+}
+.prep-col {
+  background: #fffdf9;
+  border: 3px solid #73401c;
+  border-radius: 16px;
+  padding: 12px 14px;
+  box-shadow: 0 10px 24px rgba(62, 31, 12, 0.14);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+}
+.prep-col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 2px dashed #d8a473;
+  padding-bottom: 8px;
+}
+.prep-col-header h3 {
+  font-family: var(--font-decor);
+  font-size: 14.5px;
+  color: #1e3a5f;
+}
+.prep-col-header small {
+  font-size: 10.5px;
+  color: #64748b;
+  font-weight: 700;
+}
+.prep-restock-all-btn {
+  background: #2d6a4f;
+  color: #ffffff;
+  border: 2px solid #1b4332;
+  border-radius: 10px;
+  padding: 6px 11px;
+  font-family: var(--font-main);
+  font-size: 11.5px;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 3px 0 #1b4332;
+}
+.prep-restock-all-btn:hover { background: #1b4332; transform: translateY(-1px); }
+
+.prep-cta-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+}
+.btn-open-shop-hero {
+  width: 100%;
+  justify-content: center;
+  padding: 12px 16px !important;
+  font-size: 14px !important;
+  border-radius: 14px !important;
+}
+
+.prep-shelf-restock-grid {
+  flex: 1;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  padding-right: 4px;
+  align-content: start;
+}
+.prep-flower-card {
+  background: #ffffff;
+  border: 2px solid #ead1be;
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: transform 0.14s, border-color 0.14s;
+}
+.prep-flower-card:hover:not(.locked) {
+  transform: translateY(-2px);
+  border-color: #f4acb7;
+}
+.prep-flower-card.low-stock {
+  background: #fff1f2;
+  border-color: #fda4af;
+}
+.prep-flower-card.unlockable {
+  background: #fffbeb;
+  border-color: #f59e0b;
+}
+.prep-flower-card.locked {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  opacity: 0.72;
+}
+.prep-flw-art { width: 52px; height: 64px; }
+.prep-flw-art.locked-art { filter: grayscale(1); opacity: 0.45; }
+.prep-flw-name {
+  font-size: 11.5px;
+  font-weight: 900;
+  color: #1e3a5f;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+.prep-flw-stock-row {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #475569;
+}
+.unlock-ready { color: #b45309; font-weight: 800; }
+.prep-stock-bar {
+  width: 100%;
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.prep-stock-fill {
+  height: 100%;
+  background: #40916c;
+  transition: width 0.25s;
+}
+.prep-stock-fill.low { background: #e11d48; }
+.prep-buy-btn {
+  width: 100%;
+  margin-top: 2px;
+  background: #2d6a4f;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 6px;
+  font-family: var(--font-main);
+  font-size: 10.5px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.prep-buy-btn:hover:not(:disabled) { background: #1b4332; }
+.prep-buy-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+.prep-unlock-now-btn {
+  background: linear-gradient(to bottom, #f59e0b, #d97706);
+}
+.prep-unlock-now-btn:hover:not(:disabled) {
+  background: linear-gradient(to bottom, #fbbf24, #b45309);
+}
+
+/* CỘT 3 MÀN SÁNG: KHO NGUYÊN LIỆU GIẤY GÓI & RUY BĂNG */
+.prep-materials-scroll {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 4px;
+}
+.prep-decor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.prep-sec-label {
+  font-size: 11.5px;
+  font-weight: 900;
+  color: #1e3a5f;
+}
+.prep-material-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.prep-mat-card {
+  background: #ffffff;
+  border: 1.8px solid #ead1be;
+  border-radius: 10px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.prep-mat-card.low-stock {
+  background: #fff1f2;
+  border-color: #fda4af;
+}
+.prep-mat-top {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.prep-mat-name {
+  flex: 1;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #1e3a5f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.prep-mat-qty {
+  font-size: 11px;
+  font-weight: 900;
+  color: #166534;
+  background: #dcfce7;
+  padding: 0 5px;
+  border-radius: 6px;
+}
+.prep-mat-qty.low {
+  color: #9f1239;
+  background: #ffe4e6;
+}
+.prep-mat-buy-btn {
+  width: 100%;
+  background: #2d6a4f;
+  color: #ffffff;
+  border: none;
+  border-radius: 7px;
+  padding: 4px;
+  font-family: var(--font-main);
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.prep-mat-buy-btn:hover { background: #1b4332; }
+.mini-swatch {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid #64748b;
+  flex-shrink: 0;
+}
+
+/* HIỆU ỨNG KÉO THẢ & SỐ LƯỢNG TỒN KHO TRÊN THẺ VẬT LIỆU */
+#bouquet-workspace.drag-over {
+  border-color: #10b981;
+  background: radial-gradient(circle at center, #ecfdf5 0%, #d1fae5 100%);
+  box-shadow: inset 0 0 18px rgba(16, 185, 129, 0.28);
+}
+.big-flower-bucket.is-dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+}
+.decor-visual-card { position: relative; }
+.decor-stock-pill {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  font-size: 9px;
+  font-weight: 900;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 8px;
+  padding: 0 5px;
+}
+.decor-stock-pill.empty {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.decor-visual-card.out-of-stock {
+  opacity: 0.72;
+  border-style: dashed;
+}
+
+.btn-back-to-prep {
+  background: #f8fafc;
+  border: 2px solid #1e3a5f;
+  border-radius: 10px;
+  padding: 4px 10px;
+  font-family: var(--font-main);
+  font-size: 11px;
+  font-weight: 900;
+  color: #1e3a5f;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 0 #1e3a5f;
+}
+.btn-back-to-prep:hover { background: #e2e8f0; }
+
+/* MODAL CÀI ĐẶT & CHƠI LẠI */
+.settings-dialog {
+  width: 540px;
+  background: #fff9f2;
+  color: #1e3a5f;
+}
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.settings-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #ffffff;
+  border: 2px solid #ead1be;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.settings-card.danger-card {
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+.set-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+.set-info strong { font-size: 13.5px; color: #1e3a5f; }
+.set-info small { font-size: 11px; color: #475569; font-weight: 600; line-height: 1.35; }
+.set-btn-replay, .set-btn-reset, .set-btn-cancel, .set-btn-confirm-danger {
+  border: 2px solid #1e3a5f;
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-family: var(--font-main);
+  font-size: 11.5px;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.set-btn-replay {
+  background: #e0f2fe;
+  color: #1e3a5f;
+  box-shadow: 0 2px 0 #1e3a5f;
+}
+.set-btn-reset {
+  background: #ffe4e6;
+  color: #9f1239;
+  border-color: #9f1239;
+  box-shadow: 0 2px 0 #9f1239;
+}
+.reset-confirm-box {
+  background: #fef2f2;
+  border: 2px dashed #ef4444;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #991b1b;
+}
+.reset-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.set-btn-cancel { background: #ffffff; color: #1e3a5f; }
+.set-btn-confirm-danger { background: #dc2626; color: #ffffff; border-color: #7f1d1d; }
+
+/* ==========================================================================
+   NÂNG CẤP TOÀN DIỆN: KÉO THẢ MƯỢT + SNAP, THANH KIÊN NHẪN HÀNG ĐỢI,
+   GIỜ CAO ĐIỂM, GIẤY LÓT 2 LỚP, TRANG TRÍ TIỆM & TAB MỞ KHÓA HOA CAO CẤP
+   ========================================================================== */
+
+/* 1. BÓNG KÉO THẢ HOA MƯỢT MÀ & HIỆU ỨNG SNAP */
+#drag-flower-ghost {
+  position: absolute;
+  width: 78px;
+  height: 98px;
+  transform: translate(-50%, -58%) rotate(-6deg) scale(1.08);
+  pointer-events: none;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 10px 14px rgba(30, 58, 95, 0.28));
+  transition: transform 0.08s ease-out;
+}
+#drag-flower-ghost.snap-ready {
+  transform: translate(-50%, -58%) rotate(0deg) scale(1.22);
+  filter: drop-shadow(0 0 14px rgba(16, 185, 129, 0.6));
+}
+
+.workspace-snap-ring {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  transform: translate(-50%, -50%) scale(0.9);
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  border: 3px dashed #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 25;
+  transition: opacity 0.16s ease, transform 0.18s ease;
+}
+.workspace-snap-ring span {
+  background: #ffffff;
+  color: #047857;
+  border: 2px solid #10b981;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  box-shadow: 0 3px 8px rgba(4, 120, 87, 0.18);
+}
+.workspace-snap-ring.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  animation: snap-ring-pulse 0.8s infinite ease-in-out;
+}
+@keyframes snap-ring-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.06); }
+}
+
+#bouquet-workspace.snap-pop {
+  animation: workspace-snap-flash 0.34s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes workspace-snap-flash {
+  0% { box-shadow: inset 0 0 0 0 rgba(16, 185, 129, 0); transform: scale(1); }
+  45% { box-shadow: inset 0 0 24px rgba(16, 185, 129, 0.38); transform: scale(1.015); }
+  100% { box-shadow: inset 0 0 0 0 rgba(16, 185, 129, 0); transform: scale(1); }
+}
+.crafted-flower-stem-big.stem-just-snapped {
+  animation: stem-snap-pop 0.36s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes stem-snap-pop {
+  0% { filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.8)); opacity: 0.5; }
+  100% { filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.1)); opacity: 1; }
+}
+
+/* 2. THANH KIÊN NHẪN TRÊN ĐẦU MỖI KHÁCH & VỊ TRÍ HÀNG ĐỢI ĐẾN 5 KHÁCH */
+.chibi-customer-stand.pos-4 { left: 390px; z-index: 1; transform: scale(0.62); opacity: 0.55; }
+.chibi-customer-stand.is-active-customer {
+  filter: drop-shadow(0 0 10px rgba(244, 63, 94, 0.45));
+}
+.chibi-customer-stand.is-active-customer .chibi-mood-bubble {
+  background: #fff1f2;
+  border-color: #e11d48;
+  color: #be123c;
+}
+.chibi-patience-wrap {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1.5px solid #cbd5e1;
+  border-radius: 999px;
+  padding: 2px 5px;
+  margin-bottom: 3px;
+  box-shadow: 0 2px 5px rgba(30, 58, 95, 0.12);
+}
+.chibi-p-heart { font-size: 10px; line-height: 1; }
+.chibi-p-track {
+  width: 54px;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.chibi-p-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.35s linear, background-color 0.25s ease;
+}
+.chibi-p-fill.good { background: linear-gradient(90deg, #22c55e, #16a34a); }
+.chibi-p-fill.warning { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+.chibi-p-fill.danger { background: linear-gradient(90deg, #fb7185, #e11d48); }
+
+.chibi-customer-stand.is-impatient .chibi-patience-wrap {
+  border-color: #e11d48;
+  animation: angry-wiggle 0.45s infinite ease-in-out;
+}
+@keyframes angry-wiggle {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px) rotate(-1deg); }
+  75% { transform: translateX(2px) rotate(1deg); }
+}
+
+/* 3. GIỜ CAO ĐIỂM (RUSH HOUR) */
+.hud-rush-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fb923c, #ef4444);
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+  animation: rush-pulse 0.9s infinite ease-in-out;
+}
+.rush-hour-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #fff7ed, #fed7aa);
+  border: 2px solid #ea580c;
+  color: #9a3412;
+  font-size: 11px;
+  font-weight: 900;
+  animation: rush-pulse 0.9s infinite ease-in-out;
+}
+#customer-area.rush-hour-active {
+  box-shadow: inset 0 0 24px rgba(249, 115, 22, 0.25);
+}
+@keyframes rush-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+/* 4. CLIPBOARD 3 MÓN VẬT LIỆU, 4 TAB DECOR & CHECKLIST 6 TIÊU CHÍ GỌN ĐẸP */
+.ticket-req-materials-box.three-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+.ticket-req-materials-box.three-cols .ticket-mat-item {
+  padding: 4px 5px;
+  gap: 4px;
+}
+.ticket-req-materials-box.three-cols .ticket-mat-preview {
+  width: 24px;
+  height: 24px;
+}
+.ticket-req-materials-box.three-cols .ticket-mat-desc small {
+  font-size: 9px;
+}
+.ticket-req-materials-box.three-cols .ticket-mat-desc strong {
+  font-size: 10px;
+  line-height: 1.15;
+}
+
+.decor-tabs-header.four-tabs { gap: 4px; }
+.decor-tabs-header.four-tabs .decor-tab-btn {
+  padding: 5px 2px;
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+.score-checklist.six-rows {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 8px;
+  font-size: 10px;
+}
+
+/* 5. TRANG TRÍ NỘI THẤT TIỆM HOA (MUA TRONG MENU NÂNG CẤP) */
+.shop-interior-decor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.decor-fairy-lights {
+  position: absolute;
+  top: 2px;
+  left: 14px;
+  right: 14px;
+  height: 18px;
+  border-top: 2px dashed rgba(146, 64, 14, 0.35);
+  display: flex;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+.decor-fairy-lights .bulb {
+  width: 9px;
+  height: 11px;
+  border-radius: 50% 50% 60% 60%;
+  background: #fde047;
+  box-shadow: 0 0 8px #facc15;
+  margin-top: 2px;
+  animation: bulb-glow 1.8s infinite alternate ease-in-out;
+}
+.decor-fairy-lights .bulb:nth-child(even) {
+  background: #fda4af;
+  box-shadow: 0 0 8px #fb7185;
+  animation-delay: 0.6s;
+}
+@keyframes bulb-glow {
+  from { opacity: 0.65; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1.1); }
+}
+.decor-hanging-plant {
+  position: absolute;
+  top: 12px;
+  font-size: 22px;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.12));
+}
+.decor-hanging-plant.left { left: 10px; }
+.decor-hanging-plant.right { right: 10px; }
+.decor-boutique-garland {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 241, 242, 0.9);
+  border: 1.5px solid #fda4af;
+  color: #1e3a5f;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 10px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(244, 63, 94, 0.14);
+}
+#customer-area.decor-lvl-3 {
+  background: radial-gradient(circle at top, #fffbeb 0%, #fff5eb 100%);
+}
+
+/* 6. TAB TRONG MODAL NÂNG CẤP (NỘI THẤT & GIỐNG HOA CAO CẤP) */
+.upgrade-modal-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.upg-tab-btn {
+  flex: 1;
+  background: #f1f5f9;
+  border: 2px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 7px 10px;
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 900;
+  color: #1e3a5f;
+  cursor: pointer;
+}
+.upg-tab-btn.active {
+  background: #ffe4e6;
+  border-color: #e11d48;
+  color: #9f1239;
+}
+.upgrade-flowers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.upg-flower-card {
+  background: #ffffff;
+  border: 2px solid #ead1be;
+  border-radius: 14px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-align: center;
+}
+.upg-flower-card.unlocked {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+.upg-flower-card.locked {
+  opacity: 0.68;
+  background: #f8fafc;
+}
+.upg-flw-art {
+  width: 52px;
+  height: 62px;
+}
+.upg-flw-art svg { width: 100%; height: 100%; }
+.upg-flw-name { font-size: 12px; font-weight: 900; color: #1e3a5f; }
+.upg-flw-meta { font-size: 10.5px; font-weight: 700; color: #64748b; }
+.upg-flw-buy-btn {
+  background: #1e3a5f;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-family: var(--font-main);
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.upg-flw-buy-btn.insufficient {
+  background: #94a3b8;
+}
+.flw-unlocked-tag { font-size: 11px; font-weight: 900; color: #15803d; }
+.flw-day-tag { font-size: 10.5px; font-weight: 800; color: #64748b; }

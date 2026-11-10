@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Flower Shop Story – Tiệm Hoa Nhỏ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="game-scale-wrapper">
+    <div id="game-container">
+      
+      <!-- NỀN TIỆM HOA HOẠT HÌNH COZY -->
+      <div class="shop-backdrop">
+        <div class="brick-pattern"></div>
+        <div class="sunbeam"></div>
+        <div class="shop-window">
+          <div class="window-pane"></div>
+        </div>
+        <div class="hanging-plant plant-1"></div>
+        <div class="hanging-plant plant-2"></div>
+      </div>
+
+      <!-- 1. HUD THÔNG TIN TRÊN ĐỈNH -->
+      <header id="top-hud">
+        <div class="hud-left">
+          <div class="store-badge">
+            <div class="store-logo">🌸</div>
+            <div class="store-info">
+              <span class="store-name">Tiệm Hoa Nhỏ</span>
+              <span class="store-level" id="store-level-tag">Cấp 1 • Mới Mở</span>
+            </div>
+          </div>
+
+          <div class="hud-stat-pill">
+            <span class="pill-icon">📅</span>
+            <div class="pill-content">
+              <span class="pill-title" id="hud-day-text">Ngày 1 - 07:00</span>
+              <span class="pill-sub" id="hud-phase-badge">Soạn Đồ Buổi Sáng</span>
+            </div>
+            <span class="hud-rush-pill" id="hud-rush-badge" style="display: none;">🔥 CAO ĐIỂM</span>
+          </div>
+        </div>
+
+        <div class="hud-center">
+          <div class="currency-card">
+            <span class="currency-icon">🪙</span>
+            <span class="currency-amount" id="gold-display">160</span>
+            <button class="mini-plus-btn" id="btn-quick-shop" title="Chợ Sỉ Hoa Tươi">+</button>
+          </div>
+          <div class="reputation-card">
+            <span class="rep-icon">⭐</span>
+            <span class="rep-score" id="rep-display">5.0</span>
+            <div class="rep-stars" id="rep-stars">★★★★★</div>
+          </div>
+          <div class="order-counter-card">
+            <span class="counter-label">Đơn hôm nay:</span>
+            <span class="counter-value" id="completed-orders-count">0</span>
+          </div>
+        </div>
+
+        <div class="hud-right">
+          <button class="hud-btn" id="btn-sound-toggle" title="Âm thanh"><span class="icon">🔊</span></button>
+          <button class="hud-btn" id="btn-music-toggle" title="Nhạc Lofi Cozy"><span class="icon">🎵</span></button>
+          <button class="hud-btn" id="btn-inventory-restock"><span class="icon">📦</span> Nhập Hoa</button>
+          <button class="hud-btn" id="btn-upgrade-shop"><span class="icon">✨</span> Nâng Cấp</button>
+          <button class="hud-btn" id="btn-tutorial-open"><span class="icon">📖</span> Hướng Dẫn</button>
+          <button class="hud-btn" id="btn-settings-open" title="Cài đặt & Chơi lại"><span class="icon">⚙️</span> Cài Đặt</button>
+          <button class="hud-btn" id="btn-pause-game"><span class="icon">⏸️</span></button>
+        </div>
+      </header>
+
+      <!-- BĂNG THÔNG BÁO TRẠNG THÁI TIỆM (BANNER) -->
+      <div id="event-ticker">
+        <span class="ticker-tag" id="ticker-status-tag">🌅 BUỔI SÁNG:</span>
+        <span class="ticker-text" id="event-ticker-content">Hãy soạn hoa ra xô, chuẩn bị giấy gói và ruy băng trước khi lật biển mở bán nhé!</span>
+      </div>
+
+      <!-- GIAI ĐOẠN 1: MÀN HÌNH SOẠN HÀNG BUỔI SÁNG (TÁCH BIỆT HOÀN TOÀN) -->
+      <section id="morning-prep-screen">
+        <div class="morning-prep-grid">
+          
+          <!-- CỘT 1: KẾ HOẠCH & XU HƯỚNG NGÀY MỚI -->
+          <div class="prep-col prep-col-plan">
+            <div class="prep-card-header">
+              <span class="prep-badge">📋 Kế Hoạch Sáng Nay</span>
+              <span class="prep-day-pill" id="prep-day-pill">Ngày 1</span>
+            </div>
+
+            <div class="prep-checklist-box">
+              <!-- THÔNG BÁO HOA MỞ KHÓA HÔM NAY -->
+              <div class="prep-unlock-notice" id="prep-unlock-notice">
+                <div class="prep-unlock-header">
+                  <span class="prep-unlock-title" id="prep-unlock-title">🌟 Hoa Mở Khóa Hôm Nay</span>
+                  <button class="prep-quick-btn prep-unlock-shop-btn" id="btn-prep-unlock-shop" style="display: none;">Mở khóa</button>
+                </div>
+                <div class="prep-unlock-flowers" id="prep-unlock-flowers"></div>
+                <small class="prep-unlock-desc" id="prep-unlock-desc"></small>
+              </div>
+
+              <div class="prep-item" id="prep-step-1">
+                <span class="prep-icon">🌸</span>
+                <div class="prep-info">
+                  <strong>1. Kiểm Tra Kho & Lên Kệ</strong>
+                  <small id="prep-stock-summary">Đang mở bán 3/18 loài hoa</small>
+                </div>
+                <span class="prep-check">✅</span>
+              </div>
+
+              <div class="prep-item" id="prep-step-2">
+                <span class="prep-icon">📜</span>
+                <div class="prep-info">
+                  <strong>2. Nhập Lót Trong, Giấy Ngoài & Nơ</strong>
+                  <small>Bổ sung giấy lót, giấy gói ngoài & ruy băng</small>
+                </div>
+                <span class="prep-check">✅</span>
+              </div>
+
+              <div class="prep-item" id="prep-step-3">
+                <span class="prep-icon">📰</span>
+                <div class="prep-info">
+                  <strong>3. Xu Hướng & Sự Kiện Hôm Nay</strong>
+                  <small id="prep-trend-text">Một ngày kinh doanh êm đềm...</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="prep-cta-footer">
+              <div class="prep-hint-box">
+                💡 Soạn xong hoa tươi và giấy gói? Hãy lật biển đón vị khách đầu tiên!
+              </div>
+              <button class="btn-open-shop-pulse btn-open-shop-hero" id="btn-open-store-action">
+                <span>🔔</span> LẬT BIỂN: MỞ BÁN NGAY!
+              </button>
+            </div>
+          </div>
+
+          <!-- CỘT 2: NHẬP HOA & SOẠN KỆ HOA TƯƠI SÁNG SỚM -->
+          <div class="prep-col prep-col-stock">
+            <div class="prep-col-header">
+              <div>
+                <h3>🌿 Soạn Hoa Lên Kệ & Chợ Sỉ Sáng Sớm</h3>
+                <small>Kiểm tra tồn kho từng xô hoa, nhập thêm cành tươi hoặc mở khóa giống hoa mới</small>
+              </div>
+              <button class="prep-restock-all-btn" id="btn-prep-restock-all">📦 Nhập Đầy Kệ (-10%)</button>
+            </div>
+            <div class="prep-shelf-restock-grid" id="prep-shelf-restock-grid"></div>
+          </div>
+
+          <!-- CỘT 3: KHO GIẤY LÓT, GIẤY GÓI NGOÀI & RUY BĂNG -->
+          <div class="prep-col prep-col-decor">
+            <div class="prep-col-header">
+              <div>
+                <h3>🎀 Kho Giấy Gói & Ruy Băng</h3>
+                <small>Mua bổ sung giấy lót trong, giấy ngoài & ruy băng</small>
+              </div>
+              <button class="prep-restock-all-btn prep-decor-all-btn" id="btn-prep-restock-decor">📦 Đầy Kho</button>
+            </div>
+
+            <div class="prep-materials-scroll">
+              <div class="prep-decor-section">
+                <span class="prep-sec-label">🧻 Giấy Lót Trong (5 🪙 / 5 tờ):</span>
+                <div class="prep-material-grid" id="prep-inner-paper-stock-list"></div>
+              </div>
+
+              <div class="prep-decor-section">
+                <span class="prep-sec-label">📜 Giấy Gói Ngoài (5 🪙 / 5 tờ):</span>
+                <div class="prep-material-grid" id="prep-paper-stock-list"></div>
+              </div>
+
+              <div class="prep-decor-section">
+                <span class="prep-sec-label">🎀 Kho Ruy Băng (5 🪙 / 5 dải):</span>
+                <div class="prep-material-grid" id="prep-ribbon-stock-list"></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- GIAI ĐOẠN 2: KHÔNG GIAN BÀY BÁN & PHỤC VỤ KHÁCH (PLAYFIELD) -->
+      <main id="main-playfield" style="display: none;">
+        
+        <!-- A. KHU VỰC QUẦY ĐÓN KHÁCH & BẢNG KẸP ĐƠN HÀNG CỐ ĐỊNH -->
+        <section id="customer-area">
+          <!-- TRANG TRÍ NỘI THẤT TIỆM HOA (HIỂN THỊ KHI NÂNG CẤP NỘI THẤT) -->
+          <div class="shop-interior-decor" id="shop-interior-decor"></div>
+          
+          <!-- BIỂN HIỆU TIỆM HOA -->
+          <div class="shop-signboard-container">
+            <div class="shop-signboard open" id="shop-door-sign">
+              <span class="sign-icon" id="sign-icon">🌸</span>
+              <span class="sign-text" id="sign-text">ĐANG MỞ BÁN</span>
+            </div>
+            <div class="rush-hour-banner" id="rush-hour-banner" style="display: none;">
+              <span>🔥</span> GIỜ CAO ĐIỂM
+            </div>
+            <button class="btn-back-to-prep" id="btn-quick-replay-day" title="Chơi lại ngày này từ đầu sáng">
+              <span>🔄</span> Chơi Lại Ngày
+            </button>
+          </div>
+
+          <!-- BẢNG KẸP GỖ ĐƠN HÀNG CỐ ĐỊNH -->
+          <div id="order-clipboard-stand">
+            <div class="clipboard-clamp"></div>
+
+            <!-- ĐƠN HÀNG RÕ RÀNG CỦA KHÁCH ĐẦU QUẦY -->
+            <div class="clipboard-active-order-view" id="clipboard-active-order-view" style="display: none;">
+              <div class="active-ticket-header">
+                <div class="ticket-customer-badge">
+                  <span class="cust-avatar-thumb" id="active-cust-avatar-thumb">🐱</span>
+                  <div class="cust-header-text">
+                    <span class="ticket-cust-name" id="ticket-cust-name">Bé Mèo Mộng</span>
+                    <span class="ticket-style-pill" id="ticket-cust-style">Lãng mạn</span>
+                  </div>
+                </div>
+                <div class="ticket-price-box">
+                  <span class="ticket-price" id="ticket-order-price">120 🪙</span>
+                </div>
+              </div>
+
+              <!-- Thanh kiên nhẫn to rõ -->
+              <div class="ticket-patience-wrapper">
+                <div class="ticket-patience-track">
+                  <div class="ticket-patience-bar" id="active-patience-fill" style="width: 100%;"></div>
+                </div>
+                <span class="ticket-patience-txt" id="active-patience-txt">Đang kiên nhẫn</span>
+              </div>
+
+              <!-- Danh sách hoa yêu cầu có ảnh to -->
+              <div class="ticket-req-flowers-list" id="ticket-req-flowers-list">
+                <!-- Render động các bông hoa khách muốn -->
+              </div>
+
+              <!-- Mẫu giấy lót trong, giấy gói ngoài & Nơ ruy băng khách chọn -->
+              <div class="ticket-req-materials-box three-cols">
+                <div class="ticket-mat-item" id="ticket-inner-paper-spec">
+                  <div class="ticket-mat-preview" id="ticket-inner-paper-preview"></div>
+                  <div class="ticket-mat-desc">
+                    <small>Lót trong:</small>
+                    <strong id="ticket-inner-paper-name">Lụa Trắng</strong>
+                  </div>
+                </div>
+                <div class="ticket-mat-item" id="ticket-paper-spec">
+                  <div class="ticket-mat-preview" id="ticket-paper-preview"></div>
+                  <div class="ticket-mat-desc">
+                    <small>Giấy ngoài:</small>
+                    <strong id="ticket-paper-name">Hồng Pastel</strong>
+                  </div>
+                </div>
+                <div class="ticket-mat-item" id="ticket-ribbon-spec">
+                  <div class="ticket-mat-preview" id="ticket-ribbon-preview"></div>
+                  <div class="ticket-mat-desc">
+                    <small>Ruy băng:</small>
+                    <strong id="ticket-ribbon-name">Đỏ Đô</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lời nhắn thiệp nếu có -->
+              <div class="ticket-card-quote" id="ticket-card-quote">
+                💌 <em>"Yêu em từ cái nhìn đầu tiên!"</em>
+              </div>
+            </div>
+
+            <!-- Trạng thái chờ khách tiếp theo / đang tổng kết cuối ngày -->
+            <div class="clipboard-waiting-view" id="clipboard-waiting-view" style="display: none;">
+              <div class="waiting-icon" id="clipboard-waiting-icon">🌸</div>
+              <strong class="waiting-title" id="clipboard-waiting-title">Đang chờ khách hàng tiếp theo...</strong>
+              <small class="waiting-sub" id="clipboard-waiting-sub">Khách sẽ ghé quầy ngay bây giờ</small>
+            </div>
+
+          </div>
+
+          <!-- QUẦY GỖ & HÀNG ĐỢI NHÂN VẬT CHIBI HOẠT HÌNH (ĐỨNG TỰ NHIÊN) -->
+          <div class="counter-surface-wood">
+            <div class="customer-queue-area" id="customer-queue-area">
+              <!-- Khách hàng hoạt hình đứng chờ, chỉ người đứng quầy mới hiện đơn ở bảng kẹp phía trên -->
+            </div>
+            <div class="counter-front-bar">
+              <span>🌿 QUẦY GIAO DỊCH HOA TƯƠI</span>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- B. KỆ HOA GỖ 2 TẦNG (Ở GIỮA) - HOA TO 100-130PX RÕ TỪNG CÁNH LÁ -->
+        <section id="flower-shelf-area">
+          <div class="shelf-header">
+            <div class="shelf-title">🌿 Kệ Hoa Tươi Tiệm Nhỏ</div>
+            <div class="shelf-badges">
+              <span class="shelf-guide-pill">💡 Kéo hoặc nhấp hoa xuống bàn cắm</span>
+            </div>
+          </div>
+
+          <div class="wooden-shelf-rack">
+            <!-- TẦNG 2: 7 LOÀI HOA NGHỆ THUẬT -->
+            <div class="shelf-tier shelf-top">
+              <div class="flower-buckets-container" id="shelf-tier-2"></div>
+              <div class="wood-board"></div>
+            </div>
+
+            <!-- TẦNG 1: 6 LOÀI HOA KINH ĐIỂN -->
+            <div class="shelf-tier shelf-bottom">
+              <div class="flower-buckets-container" id="shelf-tier-1"></div>
+              <div class="wood-board"></div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- 3. BÀN CẮM HOA RỘNG & GIAO DIỆN CHỌN VẬT LIỆU (PHÍA DƯỚI - HIỂN THỊ KHI MỞ BÁN) -->
+      <footer id="workbench-area" style="display: none;">
+        
+        <!-- C1. DỤNG CỤ THỢ HOA -->
+        <div class="workbench-tools-tray">
+          <div class="tray-title">Dụng Cụ</div>
+          <button class="tool-btn" id="btn-trim-flower" title="Bật Kéo Tỉa rồi bấm vào từng cành hoa để tỉa gọn (+5 🪙 boa)">
+            <span class="tool-icon">✂️</span>
+            <span id="trim-btn-label">Kéo Tỉa</span>
+          </button>
+          <button class="tool-btn" id="btn-quick-undo" title="Lấy bớt cành vừa cắm">
+            <span class="tool-icon">↩️</span>
+            <span>Bớt Cành</span>
+          </button>
+          <button class="tool-btn danger" id="btn-action-clear" title="Dọn sạch bàn cắm">
+            <span class="tool-icon">🗑️</span>
+            <span>Làm Lại</span>
+          </button>
+        </div>
+
+        <!-- C2. VÙNG CẮM HOA RỘNG TRUNG TÂM -->
+        <div class="workbench-workspace-center">
+          <div class="wooden-tabletop">
+            
+            <div id="bouquet-workspace">
+              <div class="container-style-switcher" id="container-style-switcher">
+                <button class="style-pill-btn active" data-style="cone" title="Kiểu bó giấy hình nón thanh lịch">💐 Bó Nón</button>
+                <button class="style-pill-btn" data-style="box" title="Kiểu hộp quà tròn dễ thương">🎁 Hộp Tròn</button>
+              </div>
+
+              <div class="active-tool-banner" id="active-tool-banner" style="display: none;">
+                ✂️ <strong>Đang cầm Kéo Tỉa:</strong> Bấm vào cành hoa trên bàn (hoặc trên kệ) để tỉa gọn!
+              </div>
+
+              <div id="bouquet-wrapper-back" class="flower-layer"></div>
+              <div id="bouquet-greenery-layer" class="flower-layer"></div>
+              <div id="bouquet-flowers-layer" class="flower-layer"></div>
+              <div id="bouquet-wrapper-front" class="flower-layer"></div>
+              <div id="bouquet-ribbon-layer" class="flower-layer"></div>
+              <div id="bouquet-card-layer" class="flower-layer"></div>
+
+              <div class="workspace-snap-ring" id="workspace-snap-ring">
+                <span>✨ Thả vào đây để cắm hoa</span>
+              </div>
+
+              <div id="empty-workspace-hint">
+                <div class="hint-icon">💐</div>
+                <div class="hint-text">Bàn Cắm Hoa Trống</div>
+                <div class="hint-sub">Kéo hoặc nhấp hoa trên kệ để cắm vào đây</div>
+              </div>
+            </div>
+
+            <!-- THANH ĐIỀU KHIỂN CÀNH HOA TRÊN BÀN -->
+            <div id="workbench-controls-bar">
+              <span class="bar-title">Đã cắm:</span>
+              <div id="workbench-flower-chips">
+                <span class="empty-note">Chưa cắm cành hoa nào</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- C3. 4 TAB VẬT LIỆU (GIẤY LÓT TRONG, GIẤY GÓI NGOÀI, RUY BĂNG, THIỆP) -->
+        <div class="decor-selection-container">
+          <div class="decor-tabs-header four-tabs">
+            <button class="decor-tab-btn active" data-tab="inner-paper"><span>🧻</span> Lót Trong</button>
+            <button class="decor-tab-btn" data-tab="paper"><span>📜</span> Giấy Ngoài</button>
+            <button class="decor-tab-btn" data-tab="ribbon"><span>🎀</span> Ruy Băng</button>
+            <button class="decor-tab-btn" data-tab="card"><span>💌</span> Thiệp</button>
+          </div>
+
+          <div class="decor-tab-view active" id="tab-inner-paper-view">
+            <div class="decor-items-grid" id="inner-paper-items-grid"></div>
+          </div>
+          <div class="decor-tab-view" id="tab-paper-view">
+            <div class="decor-items-grid" id="paper-items-grid"></div>
+          </div>
+          <div class="decor-tab-view" id="tab-ribbon-view">
+            <div class="decor-items-grid" id="ribbon-items-grid"></div>
+          </div>
+          <div class="decor-tab-view" id="tab-card-view">
+            <div class="decor-items-grid" id="card-items-grid"></div>
+          </div>
+        </div>
+
+        <!-- D. BẢNG CHẤM ĐIỂM TIÊU CHÍ & GIAO THU TIỀN -->
+        <div class="action-deliver-container">
+          <div class="scoring-card">
+            <div class="score-header">
+              <span class="score-title">Độ Chuẩn Khớp <span class="trim-bonus-badge" id="trim-bonus-badge" style="display: none;">✂️ Gọn +5🪙</span></span>
+              <span class="score-percent" id="order-score-badge">0%</span>
+            </div>
+            
+            <div class="score-checklist six-rows">
+              <div class="score-row" id="chk-flower-types"><span class="dot">⚪</span> Loại hoa: <span class="val">0/30đ</span></div>
+              <div class="score-row" id="chk-flower-counts"><span class="dot">⚪</span> Số lượng: <span class="val">0/20đ</span></div>
+              <div class="score-row" id="chk-inner-paper"><span class="dot">⚪</span> Lót trong: <span class="val">0/15đ</span></div>
+              <div class="score-row" id="chk-paper"><span class="dot">⚪</span> Giấy ngoài: <span class="val">0/15đ</span></div>
+              <div class="score-row" id="chk-ribbon"><span class="dot">⚪</span> Ruy băng: <span class="val">0/10đ</span></div>
+              <div class="score-row" id="chk-card"><span class="dot">⚪</span> Thiệp: <span class="val">0/10đ</span></div>
+            </div>
+
+            <div class="score-feedback" id="order-feedback-text">Cắm hoa theo yêu cầu trên bảng kẹp</div>
+
+            <div class="price-row">
+              <span class="price-label">Dự kiến thu:</span>
+              <span class="price-val" id="order-est-price">0 🪙</span>
+            </div>
+          </div>
+
+          <button class="btn-deliver-order" id="btn-action-deliver">
+            <span class="btn-sparkle">✨</span>
+            <span class="btn-main-text">GIAO & THU TIỀN</span>
+          </button>
+        </div>
+
+      </footer>
+
+      <!-- BÓNG KÉO THẢ HOA MƯỢT MÀ -->
+      <div id="drag-flower-ghost" style="display: none;"></div>
+
+      <!-- LỚP HIỆU ỨNG (FX LAYER) -->
+      <div id="fx-layer"></div>
+
+      <!-- TOAST THÔNG BÁO -->
+      <div id="game-toast"></div>
+
+      <!-- MODALS: NÂNG CẤP, CHỢ SỈ, HƯỚNG DẪN, KẾT THÚC NGÀY -->
+      <div class="game-modal" id="modal-upgrade">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog upgrade-dialog">
+          <div class="modal-header">
+            <h3>✨ Nâng Cấp & Mở Rộng Tiệm Hoa</h3>
+            <button class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="upgrade-summary-bar">
+              <div class="upg-sum-pill">
+                <span>🪙 Xu hiện có:</span>
+                <strong id="upg-modal-gold">160</strong>
+              </div>
+              <div class="upg-sum-pill">
+                <span>⭐ Tiến độ nâng cấp:</span>
+                <strong id="upg-modal-progress">0 / 15 Cấp</strong>
+              </div>
+            </div>
+            <div class="upgrade-modal-tabs">
+              <button class="upg-tab-btn active" data-upg-tab="furniture">🛋️ Nội Thất & Dụng Cụ</button>
+              <button class="upg-tab-btn" data-upg-tab="flowers">🌸 Giống Hoa Cao Cấp</button>
+            </div>
+            <div class="upgrade-list" id="upgrade-items-container"></div>
+            <div class="upgrade-flowers-grid" id="upgrade-flowers-container" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-modal" id="modal-restock">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog">
+          <div class="modal-header">
+            <h3>📦 Chợ Sỉ Hoa Tươi Sáng Sớm</h3>
+            <button class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="restock-grid" id="restock-items-container"></div>
+            <button class="btn-primary-large" id="btn-restock-all">Nhập Đầy Tất Cả Các Kệ (Chiết khấu 10%)</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-modal" id="modal-tutorial">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog tutorial-dialog">
+          <div class="modal-header">
+            <h3>📖 Cẩm Nang Thợ Hoa Khéo Tay</h3>
+            <button class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="tutorial-steps">
+              <div class="t-step">
+                <div class="t-icon">1️⃣ 🌅</div>
+                <div class="t-info">
+                  <h4>Soạn Hoa & Nguyên Liệu Buổi Sáng</h4>
+                  <p>Mỗi sáng bạn nhập hoa tươi lên kệ, kiểm tra kho giấy lót trong, giấy gói ngoài và ruy băng trước khi bấm "Lật Biển: Mở Bán".</p>
+                </div>
+              </div>
+              <div class="t-step">
+                <div class="t-icon">2️⃣ 💐</div>
+                <div class="t-info">
+                  <h4>Kéo Thả Hoa & Dùng Kéo Tỉa Thủ Công</h4>
+                  <p>Kéo trực tiếp cành hoa từ kệ thả vào bàn cắm (hiệu ứng khớp vị trí tự động). Bật ✂️ Kéo Tỉa và bấm từng cành để tỉa gọn nhận thưởng!</p>
+                </div>
+              </div>
+              <div class="t-step">
+                <div class="t-icon">3️⃣ 🧻📜</div>
+                <div class="t-info">
+                  <h4>Bọc 2 Lớp Giấy Gói, Thắt Nơ & Kẹp Thiệp</h4>
+                  <p>Tự tay chọn đủ Giấy Lót Trong, Giấy Gói Ngoài, Ruy Băng (và Thiệp nếu khách dặn) đúng theo Bảng Kẹp Đơn hàng.</p>
+                </div>
+              </div>
+              <div class="t-step">
+                <div class="t-icon">4️⃣ 🔥</div>
+                <div class="t-info">
+                  <h4>Thanh Kiên Nhẫn & Giờ Cao Điểm</h4>
+                  <p>Theo dõi thanh ❤️ trên đầu mỗi khách! Giờ Cao Điểm (11:30–13:30 & 17:00–19:00) khách rất đông — hãy bấm chọn ưu tiên khách sắp hết giờ.</p>
+                </div>
+              </div>
+            </div>
+            <button class="btn-primary-large" id="btn-close-tutorial">Đã Hiểu, Bắt Đầu Soạn Đồ Ngay! 🌸</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-modal" id="modal-day-end">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog day-end-dialog">
+          <div class="modal-header">
+            <h3>🌙 Tổng Kết Ngày Kinh Doanh</h3>
+          </div>
+          <div class="modal-body">
+            <div class="day-stats">
+              <div class="stat-box"><span class="sb-label">Đơn xong</span><span class="sb-val" id="summary-orders">0</span></div>
+              <div class="stat-box"><span class="sb-label">Doanh thu</span><span class="sb-val highlight" id="summary-revenue">0 🪙</span></div>
+              <div class="stat-box"><span class="sb-label">Tiền boa</span><span class="sb-val highlight" id="summary-tips">0 🪙</span></div>
+              <div class="stat-box"><span class="sb-label">Đánh giá</span><span class="sb-val" id="summary-stars">5.0 ⭐</span></div>
+            </div>
+            <div class="day-next-preview" id="summary-next-preview"></div>
+            <div class="day-end-actions">
+              <button class="btn-secondary-large" id="btn-summary-replay-day">🔄 Chơi Lại Ngày Này</button>
+              <button class="btn-primary-large" id="btn-start-next-day">Sang Ngày Mới: Soạn Hàng ☀️</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL CÀI ĐẶT & CHƠI LẠI -->
+      <div class="game-modal" id="modal-settings">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog settings-dialog">
+          <div class="modal-header">
+            <h3>⚙️ Cài Đặt & Quản Lý Lượt Chơi</h3>
+            <button class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="settings-section">
+              <div class="settings-card">
+                <div class="set-info">
+                  <strong>🔄 Chơi Lại Ngày Hiện Tại</strong>
+                  <small>Quay về đầu buổi sáng của ngày hôm nay (7:00) để soạn hoa và phục vụ lại từ đầu ngày.</small>
+                </div>
+                <button class="set-btn-replay" id="btn-replay-day">Chơi Lại Ngày Này</button>
+              </div>
+
+              <div class="settings-card danger-card">
+                <div class="set-info">
+                  <strong>🗑️ Chơi Lại Từ Đầu (Reset Game)</strong>
+                  <small>Đưa toàn bộ cửa hàng về Ngày 1 với số vốn khởi điểm 160 🪙 và mở khóa lại từ đầu.</small>
+                </div>
+                <button class="set-btn-reset" id="btn-reset-game">Chơi Lại Từ Đầu</button>
+              </div>
+
+              <div class="reset-confirm-box" id="reset-confirm-box" style="display: none;">
+                <span>⚠️ Bạn chắc chắn muốn xóa toàn bộ tiến độ và bắt đầu lại từ Ngày 1 (160 🪙)?</span>
+                <div class="reset-confirm-actions">
+                  <button class="set-btn-cancel" id="btn-cancel-reset">Hủy</button>
+                  <button class="set-btn-confirm-danger" id="btn-confirm-reset">Xác Nhận Chơi Lại</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
