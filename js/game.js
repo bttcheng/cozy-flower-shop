@@ -822,7 +822,7 @@ class FlowerShopGame {
       });
     });
 
-    // Chuyển kiểu gói: Bó Hình Nón / Hộp Quà Tròn
+    // Chuyển kiểu gói: Bó Hình Nón / Hộp Quà Tròn / Giỏ Mây Cắm Hoa
     document.querySelectorAll('#container-style-switcher .style-pill-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const style = e.currentTarget.dataset.style;
@@ -830,8 +830,12 @@ class FlowerShopGame {
         document.querySelectorAll('#container-style-switcher .style-pill-btn').forEach(b => b.classList.remove('active'));
         e.currentTarget.classList.add('active');
         window.soundMgr.playWrapPaper();
-        this.showToast(style === 'box' ? '🎁 Đã đổi sang kiểu Hộp Quà Tròn!' : '💐 Đã đổi sang kiểu Bó Giấy Hình Nón!');
+        const styleMeta = (typeof CONTAINER_STYLES_DATA !== 'undefined' && CONTAINER_STYLES_DATA[style])
+          ? CONTAINER_STYLES_DATA[style]
+          : { icon: '💐', name: 'Bó Giấy Hình Nón' };
+        this.showToast(`${styleMeta.icon} Đã đổi sang kiểu ${styleMeta.name}!`);
         this.renderBouquetVisual();
+        this.updateScoringChecklist();
       });
     });
 
@@ -1815,7 +1819,9 @@ class FlowerShopGame {
     cardLayer.innerHTML = '';
 
     const count = this.state.workbench.flowers.length;
-    const isBox = this.state.workbench.containerType === 'box';
+    const containerType = this.state.workbench.containerType;
+    const isBox = containerType === 'box';
+    const isBasket = containerType === 'basket';
     const innerPaperObj = this.state.workbench.innerPaper
       ? DECOR_DATA.innerPapers.find(p => p.id === this.state.workbench.innerPaper)
       : null;
@@ -1829,7 +1835,7 @@ class FlowerShopGame {
     if (count === 0 && !innerPaperObj && !paperObj && !ribbonObj) {
       hint.style.display = 'flex';
       hint.querySelector('.hint-text').textContent = 'Bàn Cắm Hoa Trống';
-      hint.querySelector('.hint-sub').textContent = 'Kéo hoặc nhấp hoa từ kệ, rồi tự tay chọn giấy lót trong, giấy ngoài & ruy băng!';
+      hint.querySelector('.hint-sub').textContent = 'Kéo hoặc nhấp hoa từ kệ, rồi chọn kiểu gói & giấy gói/ruy băng!';
       chipsContainer.innerHTML = '<span class="empty-note">Chưa cắm cành hoa nào (kéo hoặc nhấp hoa trên kệ)</span>';
     } else if (count === 0) {
       hint.style.display = 'flex';
@@ -1840,9 +1846,24 @@ class FlowerShopGame {
       hint.style.display = 'none';
     }
 
-    // 1. LỚP LƯNG SAU (VẼ GIẤY NGOÀI &/HOẶC GIẤY LÓT LỤA BÊN TRONG KHI ĐÃ CHỌN)
-    if (paperObj || innerPaperObj) {
-      if (isBox) {
+    // 1. LỚP LƯNG SAU (VẼ GIẤY NGOÀI / GIỎ MÂY & GIẤY LÓT LỤA BÊN TRONG)
+    if (paperObj || innerPaperObj || isBasket) {
+      if (isBasket) {
+        let backSvg = `<ellipse cx="130" cy="264" rx="74" ry="8" fill="#cbd5e1" opacity="0.55"/>`;
+        // Quai giỏ mây cong phía sau hoa
+        backSvg += `
+          <path d="M68,158 C68,40 192,40 192,158" fill="none" stroke="#8b5a2b" stroke-width="8" stroke-linecap="round"/>
+          <path d="M68,158 C68,40 192,40 192,158" fill="none" stroke="#c68b59" stroke-width="4" stroke-dasharray="6 4" stroke-linecap="round"/>
+          <ellipse cx="130" cy="158" rx="68" ry="12" fill="#7c4d25"/>
+        `;
+        if (innerPaperObj) {
+          backSvg += `
+            <path d="M64,158 Q80,126 98,142 Q114,122 130,138 Q146,122 162,142 Q180,126 196,158 L184,170 L76,170 Z"
+                  fill="${innerPaperObj.color}" stroke="${innerPaperObj.border}" stroke-width="1.6"/>
+          `;
+        }
+        wrapBack.innerHTML = `<svg viewBox="0 0 260 280" preserveAspectRatio="xMidYMax meet" style="width:100%; height:100%; position:absolute; bottom:0;">${backSvg}</svg>`;
+      } else if (isBox) {
         let backSvg = `<ellipse cx="130" cy="266" rx="76" ry="8" fill="#cbd5e1" opacity="0.55"/>`;
         if (paperObj) {
           backSvg += `<ellipse cx="130" cy="148" rx="68" ry="12" fill="${paperObj.border}"/>`;
@@ -1888,7 +1909,7 @@ class FlowerShopGame {
 
     // 1B. LỚP LÁ XANH TỰ NHIÊN NỀN PHÍA SAU CỤM HOA (KHI ĐÃ CẮM HOA)
     if (greeneryLayer && count > 0) {
-      const baseY = isBox ? 162 : 168;
+      const baseY = (isBox || isBasket) ? 162 : 168;
       greeneryLayer.innerHTML = `
         <svg viewBox="0 0 260 280" preserveAspectRatio="xMidYMax meet" style="width:100%; height:100%; position:absolute; bottom:0;">
           <path d="M130,${baseY} Q84,110 64,66 Q94,96 128,${baseY - 4} Z" fill="#84cc16"/>
@@ -1922,8 +1943,9 @@ class FlowerShopGame {
       `;
 
       const rowLift = Math.floor(idx / 5) * 14;
-      const xOffset = Math.sin((item.angle * Math.PI) / 180) * (isBox ? 64 : 56);
-      const yOffset = (isBox ? -10 : -22) - Math.abs(Math.cos((item.angle * Math.PI) / 180) * 18) - rowLift;
+      const wideSpread = isBox || isBasket;
+      const xOffset = Math.sin((item.angle * Math.PI) / 180) * (wideSpread ? 64 : 56);
+      const yOffset = (wideSpread ? -10 : -22) - Math.abs(Math.cos((item.angle * Math.PI) / 180) * 18) - rowLift;
       const scaleVal = isTrimmed ? 0.96 : 1.02;
 
       stemEl.style.transform = `translate(${xOffset}px, ${yOffset}px) rotate(${item.angle}deg) scale(${scaleVal})`;
@@ -1941,9 +1963,25 @@ class FlowerShopGame {
       flowersLayer.appendChild(stemEl);
     });
 
-    // 3. MẶT TRƯỚC GIẤY GÓI NGOÀI & VIỀN LÓT TRONG (CHỈ VẼ KHI ĐÃ CHỌN)
-    if (paperObj || innerPaperObj) {
-      if (isBox) {
+    // 3. MẶT TRƯỚC GIỎ MÂY / HỘP TRÒN / GIẤY GÓI NGOÀI & VIỀN LÓT TRONG
+    if (paperObj || innerPaperObj || isBasket) {
+      if (isBasket) {
+        let frontSvg = '';
+        if (innerPaperObj) {
+          frontSvg += `<path d="M68,158 Q96,174 130,170 Q164,174 192,158 L188,180 Q130,192 72,180 Z" fill="${innerPaperObj.color}" stroke="${innerPaperObj.border}" stroke-width="1.4" opacity="0.95"/>`;
+        }
+        // Thân giỏ mây đan ấm áp + đường viền màu giấy gói ngoài (nếu chọn)
+        frontSvg += `
+          <path d="M62,158 L76,254 Q130,270 184,254 L198,158 Q130,174 62,158 Z" fill="#d9a066" stroke="#7c4d25" stroke-width="2.4"/>
+          <path d="M68,182 Q130,196 192,182 M71,206 Q130,220 189,206 M74,230 Q130,244 186,230" stroke="#8b5a2b" stroke-width="2.2" fill="none" opacity="0.7"/>
+          <path d="M88,164 L96,257 M114,167 L118,261 M146,167 L142,261 M172,164 L164,257" stroke="#a06834" stroke-width="2" fill="none" opacity="0.6"/>
+          <rect x="60" y="152" width="140" height="12" rx="6" fill="#c68b59" stroke="#7c4d25" stroke-width="2"/>
+        `;
+        if (paperObj) {
+          frontSvg += `<path d="M65,172 Q130,188 195,172 L193,186 Q130,202 67,186 Z" fill="${paperObj.color}" stroke="${paperObj.border}" stroke-width="1.4" opacity="0.92"/>`;
+        }
+        wrapFront.innerHTML = `<svg viewBox="0 0 260 280" preserveAspectRatio="xMidYMax meet" style="width:100%; height:100%; position:absolute; bottom:0;">${frontSvg}</svg>`;
+      } else if (isBox) {
         let frontSvg = '';
         if (innerPaperObj) {
           frontSvg += `<path d="M68,149 Q96,168 130,164 Q164,168 192,149 L190,174 Q130,186 70,174 Z" fill="${innerPaperObj.color}" stroke="${innerPaperObj.border}" stroke-width="1.4" opacity="0.95"/>`;
@@ -1977,17 +2015,18 @@ class FlowerShopGame {
 
     // 4. RUY BĂNG & NƠ (CHỈ VẼ KHI ĐÃ CHỌN RUY BĂNG)
     if (ribbonObj) {
-      if (isBox && paperObj) {
+      if ((isBox && paperObj) || isBasket) {
+        const yBar = isBasket ? 198 : 196;
         ribbonLayer.innerHTML = `
           <svg viewBox="0 0 260 280" preserveAspectRatio="xMidYMax meet" style="width:100%; height:100%; position:absolute; bottom:0;">
-            <path d="M62,196 Q130,210 198,196 L198,212 Q130,226 62,212 Z" fill="${ribbonObj.color}"/>
-            <path d="M130,210 C106,192 98,218 125,215 Z" fill="${ribbonObj.color}"/>
-            <path d="M130,210 C154,192 162,218 135,215 Z" fill="${ribbonObj.color}"/>
-            <path d="M130,210 C110,198 104,214 125,213 Z" fill="#ffffff" opacity="0.25"/>
-            <path d="M130,210 C150,198 156,214 135,213 Z" fill="#ffffff" opacity="0.25"/>
-            <circle cx="130" cy="211" r="6.5" fill="${ribbonObj.accentColor || ribbonObj.color}"/>
-            <path d="M126,216 L116,232 L123,234 L129,218 Z" fill="${ribbonObj.color}"/>
-            <path d="M134,216 L144,232 L137,234 L131,218 Z" fill="${ribbonObj.color}"/>
+            <path d="M66,${yBar} Q130,${yBar + 14} 194,${yBar} L194,${yBar + 16} Q130,${yBar + 30} 66,${yBar + 16} Z" fill="${ribbonObj.color}"/>
+            <path d="M130,${yBar + 14} C106,${yBar - 4} 98,${yBar + 22} 125,${yBar + 19} Z" fill="${ribbonObj.color}"/>
+            <path d="M130,${yBar + 14} C154,${yBar - 4} 162,${yBar + 22} 135,${yBar + 19} Z" fill="${ribbonObj.color}"/>
+            <path d="M130,${yBar + 14} C110,${yBar + 2} 104,${yBar + 18} 125,${yBar + 17} Z" fill="#ffffff" opacity="0.25"/>
+            <path d="M130,${yBar + 14} C150,${yBar + 2} 156,${yBar + 18} 135,${yBar + 17} Z" fill="#ffffff" opacity="0.25"/>
+            <circle cx="130" cy="${yBar + 15}" r="6.5" fill="${ribbonObj.accentColor || ribbonObj.color}"/>
+            <path d="M126,${yBar + 20} L116,${yBar + 36} L123,${yBar + 38} L129,${yBar + 22} Z" fill="${ribbonObj.color}"/>
+            <path d="M134,${yBar + 20} L144,${yBar + 36} L137,${yBar + 38} L131,${yBar + 22} Z" fill="${ribbonObj.color}"/>
           </svg>
         `;
       } else {
@@ -2130,6 +2169,7 @@ class FlowerShopGame {
       }
       const price = Math.round(diyRecipe.price * (1 + priceBonus) * vipMult);
       return {
+        containerType: diyRecipe.containerType || 'cone',
         flowers: { ...diyRecipe.flowers },
         innerPaper: diyRecipe.innerPaper,
         paper: diyRecipe.paper,
@@ -2144,7 +2184,13 @@ class FlowerShopGame {
       };
     }
 
-    // 2. ĐƠN THƯỜNG / VIP / KHÁCH KHÓ TÍNH / ĐƠN GẤP
+    // 2. ĐƠN THƯỜNG / VIP / KHÁCH KHÓ TÍNH / ĐƠN GẤP (CHỌN NGẪU NHIÊN BÓ NÓN / HỘP TRÒN / GIỎ HOA)
+    const styleRoll = Math.random();
+    const containerType = styleRoll < 0.42 ? 'cone' : (styleRoll < 0.74 ? 'box' : 'basket');
+    const stylePriceAdd = (typeof CONTAINER_STYLES_DATA !== 'undefined' && CONTAINER_STYLES_DATA[containerType])
+      ? CONTAINER_STYLES_DATA[containerType].priceAdd
+      : 0;
+
     const available = Object.values(FLOWERS_DATA).filter(f => this.isFlowerUnlocked(f.id));
     let requiredTone = null;
     if (isVip || isChoosy) {
@@ -2197,10 +2243,11 @@ class FlowerShopGame {
       totalPrice += 8;
     }
 
-    totalPrice += 14;
+    totalPrice += 14 + stylePriceAdd;
     totalPrice = Math.round(totalPrice * (1 + priceBonus) * vipMult * choosyMult);
 
     return {
+      containerType: containerType,
       flowers: reqFlowers,
       innerPaper: reqInnerPaper,
       paper: reqPaper,
@@ -2447,10 +2494,24 @@ class FlowerShopGame {
       }
     }
 
+    const avatarThumbEl = document.getElementById('active-cust-avatar-thumb');
+    if (avatarThumbEl) avatarThumbEl.textContent = cust.meta.thumbEmoji || '🌸';
+
     document.getElementById('ticket-cust-name').textContent = (cust.isVip ? '👑 ' : (cust.isChoosy ? '🧐 ' : '')) + cust.meta.name;
     const styleEl = document.getElementById('ticket-cust-style');
     styleEl.textContent = cust.isVip ? `VIP • ${cust.meta.stylePref}` : (cust.isChoosy ? `Kỹ tính • ${cust.meta.stylePref}` : cust.meta.stylePref);
     styleEl.className = `ticket-style-pill ${cust.isVip ? 'vip-pill' : ''}`;
+
+    const cType = cust.order.containerType || 'cone';
+    const cMeta = (typeof CONTAINER_STYLES_DATA !== 'undefined' && CONTAINER_STYLES_DATA[cType])
+      ? CONTAINER_STYLES_DATA[cType]
+      : { icon: '💐', shortName: 'Bó Nón' };
+    const containerBadgeEl = document.getElementById('ticket-container-badge');
+    if (containerBadgeEl) {
+      containerBadgeEl.textContent = `${cMeta.icon} ${cMeta.shortName}`;
+      containerBadgeEl.className = `ticket-container-badge style-${cType}`;
+    }
+
     document.getElementById('ticket-order-price').textContent = isExpressActive
       ? `${cust.order.price * 2} 🪙 (x2)`
       : `${cust.order.price} 🪙`;
@@ -2529,6 +2590,7 @@ class FlowerShopGame {
 
     let flowerScore = 0;
     let qtyScore = 0;
+    let containerStyleScore = 0;
     let innerPaperScore = 0;
     let paperScore = 0;
     let ribbonScore = 0;
@@ -2543,13 +2605,13 @@ class FlowerShopGame {
     const reqKeys = Object.keys(reqFlowers);
     let missingNotes = [];
 
-    // 1. Loại hoa (30đ)
+    // 1. Loại hoa (25đ)
     let correctTypes = 0;
     reqKeys.forEach(k => {
       if ((currentCounts[k] || 0) > 0) correctTypes++;
       else missingNotes.push(`Chưa có ${FLOWERS_DATA[k].name}`);
     });
-    flowerScore = Math.round((correctTypes / reqKeys.length) * 30);
+    flowerScore = Math.round((correctTypes / reqKeys.length) * 25);
 
     // 2. Số lượng (20đ)
     let totalReqQty = 0;
@@ -2568,28 +2630,39 @@ class FlowerShopGame {
     });
     qtyScore = Math.min(20, Math.round((matchQtyCount / totalReqQty) * 20));
 
-    // 3. Giấy lót bên trong (15đ)
-    if (this.state.workbench.innerPaper === cust.order.innerPaper) innerPaperScore = 15;
+    // 3. Kiểu dáng đóng gói: Bó Nón / Hộp Tròn / Giỏ Hoa (15đ)
+    const reqContainer = cust.order.containerType || 'cone';
+    if (this.state.workbench.containerType === reqContainer) {
+      containerStyleScore = 15;
+    } else {
+      const cMeta = (typeof CONTAINER_STYLES_DATA !== 'undefined' && CONTAINER_STYLES_DATA[reqContainer])
+        ? CONTAINER_STYLES_DATA[reqContainer]
+        : { shortName: 'Bó Nón' };
+      missingNotes.push(`Cần kiểu ${cMeta.shortName}`);
+    }
+
+    // 4. Giấy lót bên trong (10đ)
+    if (this.state.workbench.innerPaper === cust.order.innerPaper) innerPaperScore = 10;
     else {
       const ipObj = DECOR_DATA.innerPapers.find(p => p.id === cust.order.innerPaper);
       missingNotes.push(`Cần lót ${ipObj ? ipObj.name : ''}`);
     }
 
-    // 4. Giấy gói bên ngoài (15đ)
-    if (this.state.workbench.paper === cust.order.paper) paperScore = 15;
+    // 5. Giấy gói bên ngoài (10đ)
+    if (this.state.workbench.paper === cust.order.paper) paperScore = 10;
     else {
       const pObj = DECOR_DATA.papers.find(p => p.id === cust.order.paper);
       missingNotes.push(`Cần giấy ngoài ${pObj ? pObj.name : ''}`);
     }
 
-    // 5. Ruy băng (10đ)
+    // 6. Ruy băng (10đ)
     if (this.state.workbench.ribbon === cust.order.ribbon) ribbonScore = 10;
     else {
       const rObj = DECOR_DATA.ribbons.find(r => r.id === cust.order.ribbon);
       missingNotes.push(`Cần nơ ${rObj ? rObj.name : ''}`);
     }
 
-    // 6. Thiệp (10đ)
+    // 7. Thiệp (10đ)
     if (cust.order.card) {
       if (this.state.workbench.card === cust.order.card) cardScore = 10;
       else {
@@ -2611,14 +2684,15 @@ class FlowerShopGame {
       }
     };
 
-    updateRow('chk-flower-types', flowerScore, 30);
+    updateRow('chk-flower-types', flowerScore, 25);
     updateRow('chk-flower-counts', qtyScore, 20);
-    updateRow('chk-inner-paper', innerPaperScore, 15);
-    updateRow('chk-paper', paperScore, 15);
+    updateRow('chk-container-style', containerStyleScore, 15);
+    updateRow('chk-inner-paper', innerPaperScore, 10);
+    updateRow('chk-paper', paperScore, 10);
     updateRow('chk-ribbon', ribbonScore, 10);
     updateRow('chk-card', cardScore, 10);
 
-    const totalScore = flowerScore + qtyScore + innerPaperScore + paperScore + ribbonScore + cardScore;
+    const totalScore = flowerScore + qtyScore + containerStyleScore + innerPaperScore + paperScore + ribbonScore + cardScore;
     scoreBadge.textContent = `${totalScore}%`;
     scoreBadge.style.color = totalScore >= 85 ? '#166534' : (totalScore >= 55 ? '#b45309' : '#e11d48');
 
@@ -3350,12 +3424,19 @@ class FlowerShopGame {
     if (!containerEl) return;
     const { containerType, flowers, innerPaper, paper, ribbon } = spec;
     const isBox = containerType === 'box';
+    const isBasket = containerType === 'basket';
     const innerObj = DECOR_DATA.innerPapers.find(p => p.id === innerPaper);
     const paperObj = DECOR_DATA.papers.find(p => p.id === paper);
     const ribbonObj = DECOR_DATA.ribbons.find(r => r.id === ribbon);
 
     let backSvg = '';
-    if (isBox) {
+    if (isBasket) {
+      backSvg += `<path d="M68,158 C68,40 192,40 192,158" fill="none" stroke="#8b5a2b" stroke-width="8" stroke-linecap="round"/>`;
+      backSvg += `<ellipse cx="130" cy="158" rx="68" ry="12" fill="#7c4d25"/>`;
+      if (innerObj) {
+        backSvg += `<path d="M64,158 Q80,126 98,142 Q114,122 130,138 Q146,122 162,142 Q180,126 196,158 L184,170 L76,170 Z" fill="${innerObj.color}" stroke="${innerObj.border}" stroke-width="1.6"/>`;
+      }
+    } else if (isBox) {
       if (paperObj) backSvg += `<ellipse cx="130" cy="148" rx="68" ry="12" fill="${paperObj.border}"/>`;
       if (innerObj) {
         backSvg += `<path d="M62,150 Q78,120 96,136 Q114,116 130,134 Q146,116 164,136 Q182,120 198,150 L186,162 L74,162 Z" fill="${innerObj.color}" stroke="${innerObj.border}" stroke-width="1.6"/>`;
@@ -3370,7 +3451,15 @@ class FlowerShopGame {
     }
 
     let frontSvg = '';
-    if (isBox && paperObj) {
+    if (isBasket) {
+      frontSvg = `
+        <path d="M62,158 L76,254 Q130,270 184,254 L198,158 Q130,174 62,158 Z" fill="#d9a066" stroke="#7c4d25" stroke-width="2.4"/>
+        <rect x="60" y="152" width="140" height="12" rx="6" fill="#c68b59" stroke="#7c4d25" stroke-width="2"/>
+      `;
+      if (paperObj) {
+        frontSvg += `<path d="M65,172 Q130,188 195,172 L193,186 Q130,202 67,186 Z" fill="${paperObj.color}" stroke="${paperObj.border}" stroke-width="1.4" opacity="0.92"/>`;
+      }
+    } else if (isBox && paperObj) {
       frontSvg = `
         <path d="M62,150 Q130,164 198,150 L194,252 Q130,270 66,252 Z" fill="${paperObj.color}" stroke="${paperObj.border}" stroke-width="2"/>
         <ellipse cx="130" cy="150" rx="68" ry="10" fill="none" stroke="${paperObj.border}" stroke-width="2"/>
@@ -3385,10 +3474,11 @@ class FlowerShopGame {
 
     let ribbonSvg = '';
     if (ribbonObj) {
-      if (isBox) {
+      if (isBox || isBasket) {
+        const yBar = isBasket ? 198 : 196;
         ribbonSvg = `
-          <path d="M64,196 Q130,210 196,196 L196,210 Q130,224 64,210 Z" fill="${ribbonObj.color}"/>
-          <circle cx="130" cy="208" r="6" fill="${ribbonObj.accentColor || ribbonObj.color}"/>
+          <path d="M66,${yBar} Q130,${yBar + 14} 194,${yBar} L194,${yBar + 14} Q130,${yBar + 28} 66,${yBar + 14} Z" fill="${ribbonObj.color}"/>
+          <circle cx="130" cy="${yBar + 12}" r="6" fill="${ribbonObj.accentColor || ribbonObj.color}"/>
         `;
       } else {
         ribbonSvg = `
@@ -3410,7 +3500,7 @@ class FlowerShopGame {
       const dx = Math.sin(rad) * 26;
       const dy = (1 - Math.cos(rad)) * 10 - (idx % 2 === 0 ? 4 : 0);
       flowersHtml += `
-        <div style="position:absolute; left:calc(50% + ${dx}px); bottom:${isBox ? 32 : 36}px; width:48px; height:64px; transform:translateX(-50%) translateY(${dy}px) rotate(${ang}deg); transform-origin:50% 90%; z-index:${12 + idx}; pointer-events:none;">
+        <div style="position:absolute; left:calc(50% + ${dx}px); bottom:${(isBox || isBasket) ? 32 : 36}px; width:48px; height:64px; transform:translateX(-50%) translateY(${dy}px) rotate(${ang}deg); transform-origin:50% 90%; z-index:${12 + idx}; pointer-events:none;">
           ${flw.svg}
         </div>
       `;

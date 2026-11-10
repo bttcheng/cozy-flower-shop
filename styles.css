@@ -835,8 +835,11 @@ body {
 }
 
 .chibi-character-wrap {
-  width: 84px;
-  height: 98px;
+  width: 88px;
+  height: 102px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
   animation: chibi-breath 2.5s infinite ease-in-out;
 }
 @keyframes chibi-breath {
@@ -844,6 +847,18 @@ body {
   50% { transform: translateY(-3px); }
 }
 .chibi-character { width: 100%; height: 100%; }
+.chibi-character-img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 6px rgba(62, 31, 12, 0.22));
+  pointer-events: none;
+}
+.chibi-character-img.wide-cust {
+  max-width: 112px;
+}
 
 .chibi-mood-bubble {
   position: relative;
@@ -2501,11 +2516,38 @@ body {
   white-space: nowrap;
 }
 
-.score-checklist.six-rows {
+.score-checklist.six-rows,
+.score-checklist.seven-rows {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 3px 8px;
-  font-size: 10px;
+  gap: 2px 6px;
+  font-size: 9.5px;
+}
+.ticket-right-badges {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.ticket-container-badge {
+  font-size: 9.5px;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: #e0f2fe;
+  border: 1.5px solid #38bdf8;
+  color: #0369a1;
+  white-space: nowrap;
+}
+.ticket-container-badge.style-box {
+  background: #fce7f3;
+  border-color: #f472b6;
+  color: #be185d;
+}
+.ticket-container-badge.style-basket {
+  background: #fef3c7;
+  border-color: #d97706;
+  color: #92400e;
 }
 
 /* 5. TRANG TRÍ NỘI THẤT TIỆM HOA (MUA TRONG MENU NÂNG CẤP) */
