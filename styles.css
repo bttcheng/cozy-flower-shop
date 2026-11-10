@@ -49,22 +49,24 @@ body {
 }
 
 #game-scale-wrapper {
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   background: radial-gradient(circle at center, #351c10 0%, #150a05 100%);
   overflow: hidden;
-  position: relative;
 }
 
 #game-container {
   width: 1400px;
   height: 788px;
-  max-width: 100vw;
-  position: relative;
+  max-width: none;
+  max-height: none;
+  flex-shrink: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   background: var(--bg-wall);
   overflow: hidden;
   display: flex;
@@ -2743,6 +2745,18 @@ body {
   color: #5a3825;
   line-height: 1.45;
 }
+.rotate-dismiss-btn {
+  margin-top: 4px;
+  background: #fde68a;
+  border: 2px solid #78350f;
+  border-radius: 10px;
+  padding: 7px 14px;
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 900;
+  color: #1e3a5f;
+  cursor: pointer;
+}
 
 /* Nâng cao độ nhạy cảm ứng & kích thước phím bấm cho ngón tay trên điện thoại */
 button, .big-flower-bucket, .decor-visual-card, .chibi-customer-stand, .tool-btn {
@@ -3052,7 +3066,8 @@ button, .big-flower-bucket, .decor-visual-card, .chibi-customer-stand, .tool-btn
    ========================================================================== */
 .diy-dialog {
   width: 860px;
-  max-width: 94vw;
+  max-width: 92%;
+  max-height: 92%;
 }
 .diy-body-grid {
   display: grid;
