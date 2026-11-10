@@ -226,6 +226,85 @@ class SoundManager {
     });
   }
 
+  // Tiếng chuông khẩn cấp vui tai cho Đơn Hàng Gấp (Express Order)
+  playExpressAlert() {
+    if (!this.soundEnabled) return;
+    this.init();
+    const t = this.ctx.currentTime;
+    const notes = [880, 1174.66, 880, 1174.66];
+    notes.forEach((freq, i) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t + i * 0.09);
+      gain.gain.setValueAtTime(0.14, t + i * 0.09);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.09 + 0.14);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t + i * 0.09);
+      osc.stop(t + i * 0.09 + 0.16);
+    });
+  }
+
+  // Tiếng thắt nơ Hoàn Mỹ (Perfect Bow)
+  playPerfectBow() {
+    if (!this.soundEnabled) return;
+    this.init();
+    const t = this.ctx.currentTime;
+    const sparkle = [659.25, 830.61, 987.77, 1318.51, 1661.22];
+    sparkle.forEach((freq, i) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t + i * 0.055);
+      gain.gain.setValueAtTime(0.17, t + i * 0.055);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.055 + 0.42);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t + i * 0.055);
+      osc.stop(t + i * 0.055 + 0.45);
+    });
+  }
+
+  // Tiếng phát minh công thức hoa mới (DIY Discovery)
+  playDiscovery() {
+    if (!this.soundEnabled) return;
+    this.init();
+    const t = this.ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99, 1046.5, 1318.51];
+    notes.forEach((freq, i) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, t + i * 0.08);
+      gain.gain.setValueAtTime(0.16, t + i * 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + i * 0.08 + 0.5);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(t + i * 0.08);
+      osc.stop(t + i * 0.08 + 0.52);
+    });
+  }
+
+  // Tiếng mèo kêu meo nhẹ khi vuốt ve mèo ngủ góc quầy
+  playCatPurr() {
+    if (!this.soundEnabled) return;
+    this.init();
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(520, t);
+    osc.frequency.exponentialRampToValueAtTime(760, t + 0.14);
+    osc.frequency.exponentialRampToValueAtTime(620, t + 0.28);
+    gain.gain.setValueAtTime(0.12, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.32);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.34);
+  }
+
   // Vòng lặp nhạc nền Lofi Acoustic ấm cúng
   startLofiMusic() {
     if (this.musicTimer) return;

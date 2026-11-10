@@ -300,24 +300,26 @@ body {
 .hud-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .hud-btn {
   background: #fff;
   border: var(--border-thick);
-  border-radius: 12px;
-  padding: 5px 12px;
+  border-radius: 11px;
+  padding: 5px 10px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   cursor: pointer;
   font-family: var(--font-main);
   font-weight: 800;
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--wood-dark);
   box-shadow: 0 3px 0 var(--wood-dark);
   transition: all 0.12s;
+  white-space: nowrap;
 }
 .hud-btn:hover {
   background: #fff3e6;
@@ -2708,4 +2710,687 @@ button, .big-flower-bucket, .decor-visual-card, .chibi-customer-stand, .tool-btn
     height: 24px;
     font-size: 11px;
   }
+}
+
+/* ==========================================================================
+   1. THỬ THÁCH NGẪU NHIÊN: ĐƠN HÀNG GẤP (EXPRESS) & KHÁCH KHÓ TÍNH / VIP
+   ========================================================================== */
+#order-clipboard-stand.express-order {
+  border-color: #dc2626;
+  background: linear-gradient(to bottom, #fff5f5 0%, #fffdfa 32%);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25), 0 10px 22px rgba(153, 27, 27, 0.2);
+}
+#order-clipboard-stand.choosy-order {
+  border-color: #7c3aed;
+  background: linear-gradient(to bottom, #faf5ff 0%, #fffdfa 30%);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.22), 0 10px 22px rgba(91, 33, 182, 0.16);
+}
+#order-clipboard-stand.diy-order {
+  border-color: #d97706;
+  background: linear-gradient(to bottom, #fffbeb 0%, #fffdfa 30%);
+}
+
+.ticket-special-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 4px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: #fee2e2;
+  border: 1.5px solid #ef4444;
+  font-size: 10px;
+  font-weight: 900;
+  color: #991b1b;
+}
+.ticket-special-strip.choosy-strip {
+  background: #ede9fe;
+  border-color: #8b5cf6;
+  color: #5b21b6;
+}
+.ticket-special-strip.diy-strip {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+.ticket-express-timer {
+  background: #dc2626;
+  color: #ffffff;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  animation: express-blink 0.8s infinite alternate;
+}
+@keyframes express-blink {
+  from { transform: scale(1); background: #dc2626; }
+  to { transform: scale(1.06); background: #ef4444; }
+}
+
+.ticket-tone-req-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: #f5f3ff;
+  border: 1px dashed #a78bfa;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #1e3a5f;
+}
+.chibi-customer-stand.is-express-customer .chibi-mood-bubble {
+  background: #fee2e2;
+  border-color: #dc2626;
+  color: #991b1b;
+}
+.chibi-customer-stand.is-choosy-customer .chibi-mood-bubble {
+  background: #ede9fe;
+  border-color: #7c3aed;
+  color: #4c1d95;
+}
+
+/* PHỐI MÀU HÀI HÒA TRONG BẢNG CHẤM ĐIỂM */
+.color-harmony-pill {
+  font-size: 10px;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 6px;
+  text-align: center;
+  border: 1.5px solid #cbd5e1;
+}
+.color-harmony-pill.harmony-good {
+  background: #dcfce7;
+  border-color: #22c55e;
+  color: #166534;
+}
+.color-harmony-pill.harmony-ok {
+  background: #fef9c3;
+  border-color: #facc15;
+  color: #854d0e;
+}
+.color-harmony-pill.harmony-warn {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #991b1b;
+}
+
+/* ==========================================================================
+   2. MINI-GAME THẮT NƠ THỦ CÔNG TRƯỚC KHI GIAO HÀNG
+   ========================================================================== */
+.ribbon-minigame-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 950;
+  background: rgba(30, 15, 7, 0.72);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.ribbon-minigame-card {
+  width: 440px;
+  max-width: 94%;
+  background: #fffaf4;
+  border: 4px solid #73401c;
+  border-radius: 22px;
+  padding: 18px 20px;
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  animation: rotate-card-pop 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.rm-badge {
+  display: inline-block;
+  background: #ffe4e6;
+  color: #be123c;
+  border: 1.5px solid #fda4af;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 10.5px;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+.rm-header h4 {
+  font-family: var(--font-decor);
+  font-size: 17px;
+  font-weight: 900;
+  color: #1e3a5f;
+}
+.rm-header p {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #64748b;
+  margin-top: 3px;
+}
+.rm-bouquet-preview {
+  width: 110px;
+  height: 115px;
+  background: radial-gradient(circle, #fff1f2 0%, #fffaf4 72%);
+  border: 2px dashed #f4acb7;
+  border-radius: 16px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.rm-track-wrap {
+  position: relative;
+  width: 100%;
+  height: 36px;
+  background: #e2e8f0;
+  border: 2.5px solid #3e1f0c;
+  border-radius: 999px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.rm-zone-good {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 28%;
+  width: 44%;
+  background: linear-gradient(90deg, #bbf7d0, #86efac, #bbf7d0);
+}
+.rm-zone-perfect {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 41%;
+  width: 18%;
+  background: linear-gradient(135deg, #fde047, #f59e0b);
+  border-left: 2px solid #b45309;
+  border-right: 2px solid #b45309;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rm-zone-perfect span {
+  font-size: 8.5px;
+  font-weight: 900;
+  color: #451a03;
+  white-space: nowrap;
+}
+.rm-cursor {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  background: #ffffff;
+  border: 2.5px solid #e11d48;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+.rm-result-banner {
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 900;
+}
+.rm-result-banner.perfect {
+  background: #fef08a;
+  border: 2px solid #d97706;
+  color: #92400e;
+}
+.rm-result-banner.good {
+  background: #dcfce7;
+  border: 2px solid #22c55e;
+  color: #166534;
+}
+.rm-result-banner.normal {
+  background: #f1f5f9;
+  border: 2px solid #94a3b8;
+  color: #1e3a5f;
+}
+.rm-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+.rm-tie-btn {
+  flex: 1;
+  background: linear-gradient(135deg, #f43f5e, #e11d48);
+  color: #ffffff;
+  border: 2.5px solid #881337;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #881337;
+}
+.rm-tie-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #881337; }
+.rm-skip-btn {
+  background: #f1f5f9;
+  color: #1e3a5f;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-family: var(--font-main);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   3. GÓC SÁNG TẠO & NGHIÊN CỨU MẪU HOA ĐỘC QUYỀN (DIY WORKSHOP)
+   ========================================================================== */
+.diy-dialog {
+  width: 860px;
+  max-width: 94vw;
+}
+.diy-body-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 14px;
+  max-height: 520px;
+  overflow: hidden;
+}
+.diy-builder-col, .diy-preview-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding-right: 4px;
+}
+.diy-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  font-weight: 900;
+  color: #1e3a5f;
+  border-bottom: 2px dashed #ead1be;
+  padding-bottom: 4px;
+}
+.diy-style-switch {
+  display: flex;
+  gap: 4px;
+}
+.diy-style-btn {
+  background: #f1f5f9;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #1e3a5f;
+  cursor: pointer;
+}
+.diy-style-btn.active {
+  background: #ffe4e6;
+  border-color: #e11d48;
+  color: #9f1239;
+}
+.diy-flowers-picker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  max-height: 210px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+.diy-flower-card {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 5px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.diy-flower-card.selected {
+  background: #fff1f2;
+  border-color: #f43f5e;
+}
+.diy-flw-svg { width: 34px; height: 42px; }
+.diy-flw-svg svg { width: 100%; height: 100%; }
+.diy-flw-name {
+  font-size: 10px;
+  font-weight: 800;
+  color: #1e3a5f;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+.diy-qty-ctrl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.diy-qty-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid #cbd5e1;
+  background: #f8fafc;
+  font-weight: 900;
+  color: #1e3a5f;
+  cursor: pointer;
+}
+.diy-qty-val { font-size: 11px; font-weight: 900; color: #e11d48; min-width: 16px; text-align: center; }
+
+.diy-decor-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.diy-decor-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.diy-decor-group small {
+  width: 62px;
+  flex-shrink: 0;
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #5a3825;
+}
+.diy-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.diy-chip {
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 3px 6px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #1e3a5f;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.diy-chip.active {
+  background: #fff1f2;
+  border-color: #e11d48;
+  color: #9f1239;
+  box-shadow: 0 0 0 1.5px #e11d48;
+}
+.diy-chip-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.diy-preview-box {
+  background: #fff8f0;
+  border: 2px solid #d8a473;
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.diy-preview-stage {
+  height: 175px;
+  background: radial-gradient(circle, #ffffff 0%, #fdf3eb 100%);
+  border: 2px dashed #d8a473;
+  border-radius: 12px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.diy-harmony-pill {
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #1e3a5f;
+  text-align: center;
+}
+.diy-harmony-pill.good { background: #dcfce7; color: #166534; }
+.diy-price-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #5a3825;
+  margin: 4px 0;
+}
+.diy-price-line strong { font-size: 15px; color: #b45309; }
+.diy-save-row {
+  display: flex;
+  gap: 6px;
+}
+.diy-save-row input {
+  flex: 1;
+  border: 2px solid #cbd5e1;
+  border-radius: 9px;
+  padding: 6px 8px;
+  font-family: var(--font-main);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #1e3a5f;
+  user-select: text;
+  -webkit-user-select: text;
+}
+.diy-save-btn {
+  background: linear-gradient(135deg, #2d6a4f, #1b4332);
+  color: #ffffff;
+  border: none;
+  border-radius: 9px;
+  padding: 6px 12px;
+  font-family: var(--font-main);
+  font-size: 11.5px;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.diy-menu-section {
+  background: #ffffff;
+  border: 2px solid #ead1be;
+  border-radius: 14px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.diy-menu-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.diy-menu-header strong { font-size: 12px; color: #1e3a5f; }
+.diy-menu-header small { font-size: 10px; color: #64748b; font-weight: 700; }
+.diy-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.diy-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #fffbeb;
+  border: 1.5px solid #fde68a;
+  border-radius: 10px;
+  padding: 6px 8px;
+}
+.diy-menu-info strong { font-size: 11.5px; color: #1e3a5f; display: block; }
+.diy-menu-info small { font-size: 10px; color: #64748b; font-weight: 700; }
+.diy-menu-actions { display: flex; align-items: center; gap: 6px; }
+.diy-menu-price { font-size: 12px; font-weight: 900; color: #b45309; }
+.diy-del-btn {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   4. TRANG TRÍ KHÔNG GIAN TIỆM HOA (ATMOSPHERE ITEMS & INTERACTIVE PROPS)
+   ========================================================================== */
+.upgrade-atmosphere-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding-right: 4px;
+}
+.atmo-card {
+  background: #ffffff;
+  border: 2px solid #ead1be;
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+}
+.atmo-card.owned {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+.atmo-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.atmo-icon {
+  font-size: 26px;
+  width: 42px;
+  height: 42px;
+  background: #fff8f0;
+  border: 1.5px solid #fed7aa;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.atmo-title { font-size: 12.5px; font-weight: 900; color: #1e3a5f; }
+.atmo-desc { font-size: 10.5px; color: #475569; font-weight: 600; line-height: 1.3; }
+.atmo-effect {
+  font-size: 10px;
+  font-weight: 800;
+  color: #166534;
+  background: #dcfce7;
+  padding: 3px 7px;
+  border-radius: 6px;
+}
+.atmo-buy-btn {
+  width: 100%;
+  background: #1e3a5f;
+  color: #ffffff;
+  border: none;
+  border-radius: 9px;
+  padding: 6px 10px;
+  font-family: var(--font-main);
+  font-size: 11.5px;
+  font-weight: 900;
+  cursor: pointer;
+}
+.atmo-buy-btn.insufficient { background: #94a3b8; }
+.atmo-owned-badge {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 900;
+  color: #15803d;
+  padding: 4px;
+}
+
+/* ĐỒ TRANG TRÍ HIỂN THỊ TRONG QUẦY TIỆM HOA */
+.decor-cozy-rug {
+  position: absolute;
+  bottom: 18px;
+  left: 16px;
+  right: 16px;
+  height: 26px;
+  background: repeating-linear-gradient(45deg, #fecdd3, #fecdd3 12px, #ffe4e6 12px, #ffe4e6 24px);
+  border: 2px solid #fda4af;
+  border-radius: 14px;
+  opacity: 0.72;
+}
+.decor-corner-monstera {
+  position: absolute;
+  bottom: 42px;
+  font-size: 26px;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.14));
+}
+.decor-corner-monstera.left { left: 4px; }
+.decor-corner-monstera.right { right: 6px; }
+
+.shop-counter-props {
+  position: absolute;
+  bottom: 28px;
+  right: 12px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  z-index: 9;
+  pointer-events: auto;
+}
+.counter-prop-btn {
+  background: rgba(255, 250, 240, 0.94);
+  border: 2px solid #73401c;
+  border-radius: 12px;
+  padding: 3px 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(62, 31, 12, 0.22);
+  font-size: 11px;
+  font-weight: 900;
+  color: #1e3a5f;
+  transition: transform 0.15s;
+}
+.counter-prop-btn:hover { transform: translateY(-2px) scale(1.04); }
+.prop-radio.playing {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  animation: radio-bounce 1.2s infinite ease-in-out;
+}
+@keyframes radio-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.prop-cat {
+  background: #fffbeb;
+  border-color: #d97706;
+  animation: cat-nap 2.8s infinite ease-in-out;
+}
+@keyframes cat-nap {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
 }

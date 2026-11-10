@@ -23,6 +23,8 @@ class FlowerShopGame {
       ribbonStocks: {},
       unlockedFlowers: {}, // Lưu trạng thái mở khóa từng loài hoa
       upgrades: {},
+      atmosphereItems: {}, // Đồ trang trí không gian tiệm (radio, đèn, thảm, cây, mèo ngủ)
+      customRecipes: [], // Các mẫu bó hoa độc quyền do người chơi tự sáng tạo
       dayStartSnapshot: null, // Bản lưu đầu ngày để hỗ trợ "Chơi Lại Ngày Này"
 
       // Hàng đợi khách hàng
@@ -56,6 +58,25 @@ class FlowerShopGame {
     this.dragState = null;
     this.suppressNextBucketClick = false;
     this.justSnappedStemIdx = -1;
+
+    // Trạng thái Mini-game thắt nơ
+    this.ribbonMinigame = {
+      active: false,
+      pos: 50,
+      dir: 1,
+      rafId: null,
+      lastTime: 0,
+      locked: false
+    };
+
+    // Bản nháp Góc Sáng Tạo Mẫu Hoa Độc Quyền
+    this.diyDraft = {
+      containerType: 'cone',
+      flowers: {},
+      innerPaper: 'silk_white',
+      paper: 'pink_pastel',
+      ribbon: 'wine_red'
+    };
 
     this.init();
   }
@@ -144,36 +165,107 @@ class FlowerShopGame {
     container.style.setProperty('--stem-trans-dur', `${(0.3 * mult).toFixed(2)}s`);
   }
 
+  getPatienceDecayMult() {
+    let mult = this.getUpgradeBonus('shop_decor').patienceDecayMult || 1;
+    let atmoReduction = 0;
+    if (typeof ATMOSPHERE_ITEMS_DATA !== 'undefined') {
+      ATMOSPHERE_ITEMS_DATA.forEach(item => {
+        if (this.state.atmosphereItems && this.state.atmosphereItems[item.id]) {
+          atmoReduction += item.patienceReduction || 0;
+          if (this.state.isRushHour && item.rushBonusReduction) {
+            atmoReduction += item.rushBonusReduction;
+          }
+        }
+      });
+    }
+    mult = mult * Math.max(0.45, 1 - atmoReduction);
+    return Math.max(0.35, mult);
+  }
+
+  getAtmosphereTipBonus() {
+    let bonus = this.getUpgradeBonus('shop_decor').tipBonus || 0;
+    if (typeof ATMOSPHERE_ITEMS_DATA !== 'undefined') {
+      ATMOSPHERE_ITEMS_DATA.forEach(item => {
+        if (this.state.atmosphereItems && this.state.atmosphereItems[item.id]) {
+          bonus += item.tipBonus || 0;
+        }
+      });
+    }
+    return bonus;
+  }
+
   renderShopDecorVisual() {
     const decorEl = document.getElementById('shop-interior-decor');
+    const propsEl = document.getElementById('shop-counter-props');
     const custArea = document.getElementById('customer-area');
     const lvl = this.getUpgradeLevel('shop_decor');
+    const atmo = this.state.atmosphereItems || {};
+
     if (custArea) {
       custArea.classList.remove('decor-lvl-1', 'decor-lvl-2', 'decor-lvl-3');
       if (lvl > 0) custArea.classList.add(`decor-lvl-${lvl}`);
     }
-    if (!decorEl) return;
-    if (lvl <= 0) {
-      decorEl.innerHTML = '';
-      return;
+
+    if (decorEl) {
+      let html = '';
+      if (lvl >= 1 || atmo.fairy_lights) {
+        html += `
+          <div class="decor-fairy-lights" aria-hidden="true">
+            <span class="bulb b1"></span><span class="bulb b2"></span><span class="bulb b3"></span>
+            <span class="bulb b4"></span><span class="bulb b5"></span><span class="bulb b6"></span>
+            <span class="bulb b7"></span><span class="bulb b8"></span>
+          </div>
+        `;
+      }
+      if (lvl >= 2 || atmo.corner_plants) {
+        html += `
+          <div class="decor-hanging-plant left">🌿</div>
+          <div class="decor-hanging-plant right">🪴</div>
+          <div class="decor-corner-monstera left">🌱</div>
+        `;
+      }
+      if (atmo.cozy_rug) {
+        html += `<div class="decor-cozy-rug" aria-hidden="true"></div>`;
+      }
+      if (lvl >= 3) {
+        html += `<div class="decor-boutique-garland">✨🌸 Boutique Tiệm Hoa Nhỏ 🌸✨</div>`;
+      }
+      decorEl.innerHTML = html;
     }
-    let html = `
-      <div class="decor-fairy-lights" aria-hidden="true">
-        <span class="bulb b1"></span><span class="bulb b2"></span><span class="bulb b3"></span>
-        <span class="bulb b4"></span><span class="bulb b5"></span><span class="bulb b6"></span>
-        <span class="bulb b7"></span><span class="bulb b8"></span>
-      </div>
-    `;
-    if (lvl >= 2) {
-      html += `
-        <div class="decor-hanging-plant left">🌿</div>
-        <div class="decor-hanging-plant right">🪴</div>
-      `;
+
+    if (propsEl) {
+      propsEl.innerHTML = '';
+      if (atmo.lofi_radio) {
+        const radioBtn = document.createElement('button');
+        radioBtn.className = `counter-prop-btn prop-radio ${window.soundMgr.musicEnabled ? 'playing' : ''}`;
+        radioBtn.title = 'Radio Lofi: Bấm để bật/tắt nhạc thư giãn!';
+        radioBtn.innerHTML = `<span>📻</span><span>${window.soundMgr.musicEnabled ? '🎵 Lofi On' : 'Lofi Off'}</span>`;
+        radioBtn.addEventListener('click', () => {
+          const on = window.soundMgr.toggleMusic();
+          const topMusicBtn = document.getElementById('btn-music-toggle');
+          if (topMusicBtn) {
+            topMusicBtn.querySelector('.icon').textContent = on ? '🎵' : '🎶';
+            topMusicBtn.style.color = on ? '#2d6a4f' : '';
+          }
+          this.renderShopDecorVisual();
+          this.showToast(on ? '📻 Radio Lofi đang phát nhạc thư giãn!' : '📻 Đã tắt Radio Lofi.');
+        });
+        propsEl.appendChild(radioBtn);
+      }
+
+      if (atmo.sleepy_cat) {
+        const catBtn = document.createElement('button');
+        catBtn.className = 'counter-prop-btn prop-cat';
+        catBtn.title = 'Bé Mèo ngủ gật góc quầy! Bấm để vuốt ve nhé';
+        catBtn.innerHTML = `<span>🐱</span><span>💤 Mèo cưng</span>`;
+        catBtn.addEventListener('click', () => {
+          window.soundMgr.playCatPurr();
+          this.spawnHeartParticles();
+          this.showToast('🐱 Meo~ Bé mèo thích thú dụi đầu! Khách nhìn ngắm vui vẻ hơn hẳn.');
+        });
+        propsEl.appendChild(catBtn);
+      }
     }
-    if (lvl >= 3) {
-      html += `<div class="decor-boutique-garland">✨🌸 Boutique Tiệm Hoa Nhỏ 🌸✨</div>`;
-    }
-    decorEl.innerHTML = html;
   }
 
   loadSaveData() {
@@ -194,6 +286,8 @@ class FlowerShopGame {
         this.state.ribbonStocks = parsed.ribbonStocks || {};
         this.state.unlockedFlowers = parsed.unlockedFlowers || {};
         this.state.upgrades = parsed.upgrades || {};
+        this.state.atmosphereItems = parsed.atmosphereItems || {};
+        this.state.customRecipes = Array.isArray(parsed.customRecipes) ? parsed.customRecipes : [];
         this.state.dayStartSnapshot = parsed.dayStartSnapshot || null;
       } catch (e) {
         console.warn('Lỗi đọc lưu trữ:', e);
@@ -235,6 +329,8 @@ class FlowerShopGame {
       ribbonStocks: this.state.ribbonStocks,
       unlockedFlowers: this.state.unlockedFlowers,
       upgrades: this.state.upgrades,
+      atmosphereItems: this.state.atmosphereItems,
+      customRecipes: this.state.customRecipes,
       dayStartSnapshot: this.state.dayStartSnapshot
     };
     localStorage.setItem('flowershop_saved_game', JSON.stringify(dataToSave));
@@ -253,7 +349,9 @@ class FlowerShopGame {
       paperStocks: { ...this.state.paperStocks },
       ribbonStocks: { ...this.state.ribbonStocks },
       unlockedFlowers: { ...this.state.unlockedFlowers },
-      upgrades: { ...this.state.upgrades }
+      upgrades: { ...this.state.upgrades },
+      atmosphereItems: { ...this.state.atmosphereItems },
+      customRecipes: JSON.parse(JSON.stringify(this.state.customRecipes || []))
     };
   }
 
@@ -276,6 +374,8 @@ class FlowerShopGame {
       if (snap.ribbonStocks) this.state.ribbonStocks = { ...snap.ribbonStocks };
       this.state.unlockedFlowers = { ...snap.unlockedFlowers };
       this.state.upgrades = { ...snap.upgrades };
+      if (snap.atmosphereItems) this.state.atmosphereItems = { ...snap.atmosphereItems };
+      if (Array.isArray(snap.customRecipes)) this.state.customRecipes = JSON.parse(JSON.stringify(snap.customRecipes));
     }
 
     this.normalizeUpgrades();
@@ -328,6 +428,8 @@ class FlowerShopGame {
     this.state.currentEventKey = 'normal';
     this.state.unlockedFlowers = {};
     this.state.upgrades = {};
+    this.state.atmosphereItems = {};
+    this.state.customRecipes = [];
     this.state.customersQueue = [];
     this.state.activeCustomerIdx = 0;
     this.state.dayStats = { orders: 0, revenue: 0, tips: 0, ratings: [] };
@@ -537,15 +639,42 @@ class FlowerShopGame {
       const enabled = window.soundMgr.toggleMusic();
       e.currentTarget.querySelector('.icon').textContent = enabled ? '🎵' : '🎶';
       e.currentTarget.style.color = enabled ? '#2d6a4f' : '';
+      this.renderShopDecorVisual();
       this.showToast(enabled ? 'Đã bật nhạc Lofi Cozy' : 'Đã tắt nhạc nền');
     });
 
-    // Modal HUD
+    // Modal HUD & Góc Sáng Tạo
+    const diyBtn = document.getElementById('btn-diy-workshop');
+    if (diyBtn) {
+      diyBtn.addEventListener('click', () => this.openDiyWorkshop());
+    }
     document.getElementById('btn-quick-shop').addEventListener('click', () => this.openModal('modal-restock'));
     document.getElementById('btn-inventory-restock').addEventListener('click', () => this.openModal('modal-restock'));
     document.getElementById('btn-upgrade-shop').addEventListener('click', () => this.openModal('modal-upgrade'));
     document.getElementById('btn-tutorial-open').addEventListener('click', () => this.openModal('modal-tutorial'));
     document.getElementById('btn-pause-game').addEventListener('click', () => this.togglePauseGame());
+
+    // Mini-game Thắt Nơ
+    const rmTieBtn = document.getElementById('btn-rm-tie');
+    const rmTrack = document.getElementById('rm-track-wrap');
+    const rmSkipBtn = document.getElementById('btn-rm-skip');
+    if (rmTieBtn) rmTieBtn.addEventListener('click', () => this.stopRibbonMinigame(false));
+    if (rmTrack) rmTrack.addEventListener('click', () => this.stopRibbonMinigame(false));
+    if (rmSkipBtn) rmSkipBtn.addEventListener('click', () => this.stopRibbonMinigame(true));
+
+    // Góc Sáng Tạo DIY
+    document.querySelectorAll('#diy-style-switch .diy-style-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        this.diyDraft.containerType = e.currentTarget.dataset.diyStyle;
+        document.querySelectorAll('#diy-style-switch .diy-style-btn').forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        this.renderDiyPreview();
+      });
+    });
+    const diySaveBtn = document.getElementById('btn-diy-save');
+    if (diySaveBtn) {
+      diySaveBtn.addEventListener('click', () => this.saveDiyRecipe());
+    }
 
     const settingsBtn = document.getElementById('btn-settings-open');
     if (settingsBtn) {
@@ -627,15 +756,17 @@ class FlowerShopGame {
       });
     }
 
-    // Chuyển tab trong Modal Nâng Cấp (Nội Thất vs Giống Hoa Cao Cấp)
+    // Chuyển tab trong Modal Nâng Cấp (Dụng Cụ vs Trang Trí Tiệm vs Giống Hoa Cao Cấp)
     document.querySelectorAll('.upgrade-modal-tabs .upg-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const tab = e.currentTarget.dataset.upgTab;
         document.querySelectorAll('.upgrade-modal-tabs .upg-tab-btn').forEach(b => b.classList.remove('active'));
         e.currentTarget.classList.add('active');
         const upgList = document.getElementById('upgrade-items-container');
+        const atmoList = document.getElementById('upgrade-atmosphere-container');
         const flwList = document.getElementById('upgrade-flowers-container');
         if (upgList) upgList.style.display = tab === 'furniture' ? 'flex' : 'none';
+        if (atmoList) atmoList.style.display = tab === 'atmosphere' ? 'grid' : 'none';
         if (flwList) flwList.style.display = tab === 'flowers' ? 'grid' : 'none';
       });
     });
@@ -702,6 +833,10 @@ class FlowerShopGame {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && this.activeTool !== 'none') {
         this.setActiveTool('none');
+      }
+      if (this.ribbonMinigame && this.ribbonMinigame.active && (e.key === ' ' || e.key === 'Enter')) {
+        e.preventDefault();
+        this.stopRibbonMinigame(false);
       }
     });
 
@@ -1902,7 +2037,7 @@ class FlowerShopGame {
     }
   }
 
-  // 6. HỆ THỐNG KHÁCH HÀNG & BẢNG KẸP ĐƠN HÀNG CỐ ĐỊNH
+  // 6. HỆ THỐNG KHÁCH HÀNG, ĐƠN GẤP, KHÁCH KHÓ TÍNH & BẢNG KẸP ĐƠN HÀNG
   spawnCustomer() {
     if (this.state.phase !== 'OPEN' || this.state.isPaused) return;
     if (this.state.hour >= 21 || (this.state.hour === 20 && this.state.minute >= 40)) return;
@@ -1910,8 +2045,27 @@ class FlowerShopGame {
 
     const customerMeta = CUSTOMERS_DATA[Math.floor(Math.random() * CUSTOMERS_DATA.length)];
     const vipBonus = this.getUpgradeBonus('vip_signboard');
-    const isVip = Math.random() < (vipBonus.vipChance || 0.05);
-    const order = this.generateVisualOrder(this.state.level, isVip);
+    const isVip = Math.random() < (vipBonus.vipChance || 0.10);
+    const isChoosy = !isVip ? Math.random() < 0.22 : Math.random() < 0.45;
+
+    // Đơn Hàng Gấp (Express Order): xuất hiện ngẫu nhiên khi chưa có đơn gấp khác trong hàng đợi
+    const hasExpressInQueue = this.state.customersQueue.some(c => c.order.isExpress && !c.isExpressExpired);
+    const isExpress = !hasExpressInQueue && Math.random() < 0.22;
+
+    // Khách có thể đặt Mẫu Độc Quyền từ Góc Sáng Tạo của tiệm (nếu đã phát minh ít nhất 1 mẫu)
+    const eligibleDiy = (this.state.customRecipes || []).filter(r =>
+      Object.keys(r.flowers).every(fId => this.isFlowerUnlocked(fId))
+    );
+    const pickedDiy = (!isExpress && eligibleDiy.length > 0 && Math.random() < 0.28)
+      ? eligibleDiy[Math.floor(Math.random() * eligibleDiy.length)]
+      : null;
+
+    const order = this.generateVisualOrder(this.state.level, {
+      isVip,
+      isChoosy,
+      isExpress,
+      diyRecipe: pickedDiy
+    });
 
     const patienceBonus = this.getUpgradeBonus('fast_hands').patienceBonus || 0;
     const totalStems = Object.values(order.flowers).reduce((sum, n) => sum + n, 0);
@@ -1922,9 +2076,12 @@ class FlowerShopGame {
       id: 'cust_' + Date.now() + '_' + Math.floor(Math.random() * 100),
       meta: customerMeta,
       isVip: isVip,
+      isChoosy: isChoosy,
       order: order,
       maxPatience: basePatience,
       patience: basePatience,
+      expressTimeLeft: isExpress ? 48 : 0,
+      isExpressExpired: false,
       createdAt: Date.now()
     };
 
@@ -1932,32 +2089,98 @@ class FlowerShopGame {
     this.renderCustomerQueue();
     this.updateActiveOrderClipboard();
     this.updateScoringChecklist();
+
+    if (isExpress) {
+      window.soundMgr.playExpressAlert();
+      this.showToast(`⚡ ĐƠN HÀNG GẤP từ ${customerMeta.name}! Giao trong 48s để nhận x2 tiền đơn!`);
+    } else if (pickedDiy) {
+      window.soundMgr.playDoorBell();
+      this.showToast(`💡 ${customerMeta.name} ghé tiệm đặt riêng Mẫu Độc Quyền "${pickedDiy.name}"!`);
+    }
   }
 
-  generateVisualOrder(level, isVip = false) {
-    // CHỈ CHỌN NHỮNG HOA ĐÃ ĐƯỢC MỞ KHÓA THEO NGÀY HIỆN TẠI!
+  generateVisualOrder(level, opts = {}) {
+    const isVip = typeof opts === 'boolean' ? opts : !!opts.isVip;
+    const isChoosy = typeof opts === 'object' && !!opts.isChoosy;
+    const isExpress = typeof opts === 'object' && !!opts.isExpress;
+    const diyRecipe = typeof opts === 'object' ? opts.diyRecipe : null;
+
+    const priceBonus = this.getUpgradeBonus('golden_shears').priceBonus || 0;
+    const vipMult = isVip ? (this.getUpgradeBonus('vip_signboard').vipPriceMult || 1.3) : 1;
+    const choosyMult = isChoosy ? 1.15 : 1;
+
+    // 1. NẾU LÀ ĐƠN ĐẶT MẪU ĐỘC QUYỀN TỪ GÓC SÁNG TẠO
+    if (diyRecipe) {
+      let cardReq = null;
+      let cardMsg = '';
+      if (Math.random() > 0.5) {
+        const cardObj = DECOR_DATA.cards[Math.floor(Math.random() * DECOR_DATA.cards.length)];
+        cardReq = cardObj.id;
+        cardMsg = cardObj.sampleMsg;
+      }
+      const price = Math.round(diyRecipe.price * (1 + priceBonus) * vipMult);
+      return {
+        flowers: { ...diyRecipe.flowers },
+        innerPaper: diyRecipe.innerPaper,
+        paper: diyRecipe.paper,
+        ribbon: diyRecipe.ribbon,
+        card: cardReq,
+        cardMsg: cardMsg,
+        requiredTone: diyRecipe.toneId || null,
+        isDiyOrder: true,
+        diyName: diyRecipe.name,
+        isExpress: false,
+        price: price
+      };
+    }
+
+    // 2. ĐƠN THƯỜNG / VIP / KHÁCH KHÓ TÍNH / ĐƠN GẤP
     const available = Object.values(FLOWERS_DATA).filter(f => this.isFlowerUnlocked(f.id));
+    let requiredTone = null;
+    if (isVip || isChoosy) {
+      const toneKeys = Object.keys(COLOR_TONE_META).filter(tKey =>
+        available.some(f => Array.isArray(f.tones) && f.tones.includes(tKey))
+      );
+      if (toneKeys.length > 0) {
+        requiredTone = toneKeys[Math.floor(Math.random() * toneKeys.length)];
+      }
+    }
+
+    const tonePool = requiredTone
+      ? available.filter(f => Array.isArray(f.tones) && f.tones.includes(requiredTone))
+      : available;
+    const flowerPool = tonePool.length > 0 ? tonePool : available;
+
     const reqFlowers = {};
     let totalPrice = 0;
 
-    const numTypes = (available.length >= 2 && (this.state.currentDay >= 2 || level >= 2) && Math.random() > 0.4) ? 2 : 1;
-    const shuffled = [...available].sort(() => 0.5 - Math.random());
+    const numTypes = (flowerPool.length >= 2 && (this.state.currentDay >= 2 || level >= 2) && Math.random() > 0.4) ? 2 : 1;
+    const shuffled = [...flowerPool].sort(() => 0.5 - Math.random());
 
     for (let i = 0; i < numTypes; i++) {
       const f = shuffled[i];
       if (!f) break;
-      const count = 2 + Math.floor(Math.random() * (level >= 3 ? 4 : 3));
+      const maxRand = isExpress ? 2 : (level >= 3 ? 4 : 3);
+      const count = 2 + Math.floor(Math.random() * maxRand);
       reqFlowers[f.id] = count;
       totalPrice += f.basePrice * count;
     }
 
-    const reqInnerPaper = DECOR_DATA.innerPapers[Math.floor(Math.random() * DECOR_DATA.innerPapers.length)].id;
-    const reqPaper = DECOR_DATA.papers[Math.floor(Math.random() * DECOR_DATA.papers.length)].id;
-    const reqRibbon = DECOR_DATA.ribbons[Math.floor(Math.random() * DECOR_DATA.ribbons.length)].id;
+    const pickByTone = (arr) => {
+      if (requiredTone) {
+        const matched = arr.filter(x => Array.isArray(x.tones) && x.tones.includes(requiredTone));
+        if (matched.length > 0) return matched[Math.floor(Math.random() * matched.length)].id;
+      }
+      return arr[Math.floor(Math.random() * arr.length)].id;
+    };
+
+    const reqInnerPaper = pickByTone(DECOR_DATA.innerPapers);
+    const reqPaper = pickByTone(DECOR_DATA.papers);
+    const reqRibbon = pickByTone(DECOR_DATA.ribbons);
 
     let reqCard = null;
     let cardMsg = '';
-    if (Math.random() > 0.4) {
+    if (!isExpress && Math.random() > 0.4) {
       const cardObj = DECOR_DATA.cards[Math.floor(Math.random() * DECOR_DATA.cards.length)];
       reqCard = cardObj.id;
       cardMsg = cardObj.sampleMsg;
@@ -1965,11 +2188,7 @@ class FlowerShopGame {
     }
 
     totalPrice += 14;
-
-    // Áp dụng nâng cấp Kéo Tỉa Mạ Vàng (tăng giá bán) & Khách VIP
-    const priceBonus = this.getUpgradeBonus('golden_shears').priceBonus || 0;
-    const vipMult = isVip ? (this.getUpgradeBonus('vip_signboard').vipPriceMult || 1.3) : 1;
-    totalPrice = Math.round(totalPrice * (1 + priceBonus) * vipMult);
+    totalPrice = Math.round(totalPrice * (1 + priceBonus) * vipMult * choosyMult);
 
     return {
       flowers: reqFlowers,
@@ -1978,7 +2197,94 @@ class FlowerShopGame {
       ribbon: reqRibbon,
       card: reqCard,
       cardMsg: cardMsg,
+      requiredTone: requiredTone,
+      isDiyOrder: false,
+      diyName: '',
+      isExpress: isExpress,
       price: totalPrice
+    };
+  }
+
+  evaluateColorHarmony(flowerIds, innerId, paperId, ribbonId, targetTone = null) {
+    if (!flowerIds || flowerIds.length === 0 || !innerId || !paperId || !ribbonId) {
+      return { ready: false, level: 'none', toneId: null, bonusMult: 0, label: 'Chưa đủ vật liệu để chấm phối màu' };
+    }
+
+    const innerObj = DECOR_DATA.innerPapers.find(x => x.id === innerId);
+    const paperObj = DECOR_DATA.papers.find(x => x.id === paperId);
+    const ribbonObj = DECOR_DATA.ribbons.find(x => x.id === ribbonId);
+    const items = [
+      ...flowerIds.map(id => FLOWERS_DATA[id]).filter(Boolean),
+      innerObj,
+      paperObj,
+      ribbonObj
+    ].filter(Boolean);
+
+    const allTones = Object.keys(COLOR_TONE_META);
+    let bestTone = null;
+    let bestMatchCount = 0;
+
+    allTones.forEach(tKey => {
+      const cnt = items.filter(it => Array.isArray(it.tones) && it.tones.includes(tKey)).length;
+      if (cnt > bestMatchCount) {
+        bestMatchCount = cnt;
+        bestTone = tKey;
+      }
+    });
+
+    if (targetTone) {
+      const targetMatch = items.filter(it => Array.isArray(it.tones) && it.tones.includes(targetTone)).length;
+      const toneMeta = COLOR_TONE_META[targetTone];
+      if (targetMatch >= items.length - 1) {
+        return {
+          ready: true,
+          level: 'good',
+          toneId: targetTone,
+          bonusMult: 0.16,
+          label: `🎨 Chuẩn ${toneMeta.badge} (+16% 🪙)`
+        };
+      } else if (targetMatch >= Math.ceil(items.length * 0.6)) {
+        return {
+          ready: true,
+          level: 'ok',
+          toneId: targetTone,
+          bonusMult: 0.06,
+          label: `🎨 Khá hợp ${toneMeta.name} (+6% 🪙)`
+        };
+      }
+      return {
+        ready: true,
+        level: 'warn',
+        toneId: targetTone,
+        bonusMult: 0,
+        label: `🎨 Chưa đúng ${toneMeta.name}`
+      };
+    }
+
+    const bestMeta = bestTone ? COLOR_TONE_META[bestTone] : null;
+    if (bestMatchCount >= items.length) {
+      return {
+        ready: true,
+        level: 'good',
+        toneId: bestTone,
+        bonusMult: 0.12,
+        label: `🎨 Phối màu tuyệt mỹ: ${bestMeta.name} (+12% 🪙)`
+      };
+    } else if (bestMatchCount >= items.length - 1) {
+      return {
+        ready: true,
+        level: 'ok',
+        toneId: bestTone,
+        bonusMult: 0.06,
+        label: `🎨 Phối màu hài hòa (+6% 🪙)`
+      };
+    }
+    return {
+      ready: true,
+      level: 'warn',
+      toneId: null,
+      bonusMult: 0,
+      label: '🎨 Màu sắc ngẫu hứng (+0%)'
     };
   }
 
@@ -1992,14 +2298,17 @@ class FlowerShopGame {
       const pct = Math.max(0, Math.min(100, (cust.patience / cust.maxPatience) * 100));
       const pState = pct < 25 ? 'danger' : (pct < 55 ? 'warning' : 'good');
 
-      stand.className = `chibi-customer-stand pos-${index} ${cust.isVip ? 'is-vip-customer' : ''} ${isSelected ? 'is-active-customer' : ''} ${pct < 25 ? 'is-impatient' : ''}`;
+      stand.className = `chibi-customer-stand pos-${index} ${cust.isVip ? 'is-vip-customer' : ''} ${cust.isChoosy ? 'is-choosy-customer' : ''} ${cust.order.isExpress && !cust.isExpressExpired ? 'is-express-customer' : ''} ${isSelected ? 'is-active-customer' : ''} ${pct < 25 ? 'is-impatient' : ''}`;
       stand.id = `cust-stand-${cust.id}`;
 
       let mood = 'Đang chờ';
-      if (isSelected) mood = cust.isVip ? '👑 Đang phục vụ VIP' : '💬 Đang phục vụ';
+      if (cust.order.isExpress && !cust.isExpressExpired) mood = `⚡ Gấp (${Math.ceil(cust.expressTimeLeft)}s)`;
+      else if (isSelected) mood = cust.isVip ? '👑 Đang phục vụ VIP' : (cust.isChoosy ? '🧐 Khó tính' : '💬 Đang phục vụ');
       else if (pct < 25) mood = '💢 Sắp bỏ đi!';
-      else if (index === 0) mood = cust.isVip ? '👑 Khách VIP' : '🌸 Đứng quầy';
-      else mood = cust.isVip ? '👑 VIP Chờ' : '👀 Đang chờ';
+      else if (cust.isVip) mood = '👑 Khách VIP';
+      else if (cust.isChoosy) mood = '🧐 Kỹ tính';
+      else if (index === 0) mood = '🌸 Đứng quầy';
+      else mood = '👀 Đang chờ';
 
       stand.innerHTML = `
         <div class="chibi-mood-bubble ${cust.isVip ? 'vip-bubble' : ''}">${mood}</div>
@@ -2045,8 +2354,13 @@ class FlowerShopGame {
         heart.textContent = pct < 25 ? '💔' : '❤️';
       }
       stand.classList.toggle('is-impatient', pct < 25);
-      if (moodEl && index !== this.state.activeCustomerIdx && pct < 25) {
-        moodEl.textContent = '💢 Sắp bỏ đi!';
+      stand.classList.toggle('is-express-customer', !!(cust.order.isExpress && !cust.isExpressExpired));
+      if (moodEl) {
+        if (cust.order.isExpress && !cust.isExpressExpired) {
+          moodEl.textContent = `⚡ Gấp (${Math.max(1, Math.ceil(cust.expressTimeLeft))}s)`;
+        } else if (index !== this.state.activeCustomerIdx && pct < 25) {
+          moodEl.textContent = '💢 Sắp bỏ đi!';
+        }
       }
     });
   }
@@ -2055,10 +2369,17 @@ class FlowerShopGame {
     if (this.state.phase !== 'OPEN' && this.state.phase !== 'CLOSING') return;
 
     const cust = this.state.customersQueue[this.state.activeCustomerIdx];
+    const standEl = document.getElementById('order-clipboard-stand');
     const orderView = document.getElementById('clipboard-active-order-view');
     const waitingView = document.getElementById('clipboard-waiting-view');
+    const specialStrip = document.getElementById('ticket-special-strip');
+    const specialBadge = document.getElementById('ticket-special-badge');
+    const expressTimerEl = document.getElementById('ticket-express-timer');
+    const toneReqRow = document.getElementById('ticket-tone-req-row');
 
     if (!cust) {
+      if (standEl) standEl.classList.remove('express-order', 'choosy-order', 'diy-order');
+      if (specialStrip) specialStrip.style.display = 'none';
       const isClosing = this.state.phase === 'CLOSING';
       orderView.style.display = 'none';
       if (waitingView) {
@@ -2077,14 +2398,55 @@ class FlowerShopGame {
     if (waitingView) waitingView.style.display = 'none';
     orderView.style.display = 'flex';
 
-    document.getElementById('ticket-cust-name').textContent = (cust.isVip ? '👑 ' : '') + cust.meta.name;
+    const isExpressActive = cust.order.isExpress && !cust.isExpressExpired;
+    if (standEl) {
+      standEl.classList.toggle('express-order', isExpressActive);
+      standEl.classList.toggle('choosy-order', !isExpressActive && (cust.isChoosy || cust.isVip));
+      standEl.classList.toggle('diy-order', !isExpressActive && cust.order.isDiyOrder);
+    }
+
+    if (specialStrip && specialBadge && expressTimerEl) {
+      if (isExpressActive) {
+        specialStrip.style.display = 'flex';
+        specialStrip.className = 'ticket-special-strip';
+        specialBadge.textContent = '⚡ ĐƠN HÀNG GẤP • x2 THƯỞNG';
+        expressTimerEl.style.display = 'inline-block';
+        expressTimerEl.textContent = `⏱️ ${Math.max(1, Math.ceil(cust.expressTimeLeft))}s`;
+      } else if (cust.order.isDiyOrder) {
+        specialStrip.style.display = 'flex';
+        specialStrip.className = 'ticket-special-strip diy-strip';
+        specialBadge.textContent = `💡 MẪU ĐỘC QUYỀN: "${cust.order.diyName}"`;
+        expressTimerEl.style.display = 'none';
+      } else if (cust.isChoosy || cust.isVip) {
+        specialStrip.style.display = 'flex';
+        specialStrip.className = 'ticket-special-strip choosy-strip';
+        specialBadge.textContent = cust.isVip ? '👑 KHÁCH VIP ĐẶC BIỆT (+TIP LỚN)' : '🧐 KHÁCH KỸ TÍNH • CHÚ Ý TÔNG MÀU';
+        expressTimerEl.style.display = 'none';
+      } else {
+        specialStrip.style.display = 'none';
+      }
+    }
+
+    if (toneReqRow) {
+      if (cust.order.requiredTone && COLOR_TONE_META[cust.order.requiredTone]) {
+        const tm = COLOR_TONE_META[cust.order.requiredTone];
+        toneReqRow.style.display = 'flex';
+        toneReqRow.innerHTML = `<span>${tm.badge}:</span> <span>${tm.hint}</span>`;
+      } else {
+        toneReqRow.style.display = 'none';
+      }
+    }
+
+    document.getElementById('ticket-cust-name').textContent = (cust.isVip ? '👑 ' : (cust.isChoosy ? '🧐 ' : '')) + cust.meta.name;
     const styleEl = document.getElementById('ticket-cust-style');
-    styleEl.textContent = cust.isVip ? `VIP • ${cust.meta.stylePref}` : cust.meta.stylePref;
+    styleEl.textContent = cust.isVip ? `VIP • ${cust.meta.stylePref}` : (cust.isChoosy ? `Kỹ tính • ${cust.meta.stylePref}` : cust.meta.stylePref);
     styleEl.className = `ticket-style-pill ${cust.isVip ? 'vip-pill' : ''}`;
-    document.getElementById('ticket-order-price').textContent = `${cust.order.price} 🪙`;
+    document.getElementById('ticket-order-price').textContent = isExpressActive
+      ? `${cust.order.price * 2} 🪙 (x2)`
+      : `${cust.order.price} 🪙`;
 
     const pct = Math.max(0, Math.min(100, (cust.patience / cust.maxPatience) * 100));
-    const decorMult = this.getUpgradeBonus('shop_decor').patienceDecayMult || 1;
+    const decorMult = this.getPatienceDecayMult();
     const secsLeft = Math.max(0, Math.ceil((cust.patience / (1.2 * decorMult)) * 1.5));
     const fill = document.getElementById('active-patience-fill');
     const patienceTxt = document.getElementById('active-patience-txt');
@@ -2139,17 +2501,19 @@ class FlowerShopGame {
     }
   }
 
-  // 7. CƠ CHẾ CHẤM ĐIỂM 6 TIÊU CHÍ (30đ - 20đ - 15đ - 15đ - 10đ - 10đ)
+  // 7. CƠ CHẾ CHẤM ĐIỂM 6 TIÊU CHÍ + PHỐI MÀU HÀI HÒA
   updateScoringChecklist() {
     const cust = this.state.customersQueue[this.state.activeCustomerIdx];
     const scoreBadge = document.getElementById('order-score-badge');
     const feedbackText = document.getElementById('order-feedback-text');
     const estPriceEl = document.getElementById('order-est-price');
+    const harmonyBadge = document.getElementById('color-harmony-badge');
 
     if (!cust) {
       scoreBadge.textContent = '0%';
       feedbackText.textContent = this.state.phase === 'PREPARING' ? 'Đang chuẩn bị mở bán' : 'Chưa có đơn hàng';
       estPriceEl.textContent = '0 🪙';
+      if (harmonyBadge) harmonyBadge.style.display = 'none';
       return;
     }
 
@@ -2248,8 +2612,26 @@ class FlowerShopGame {
     scoreBadge.textContent = `${totalScore}%`;
     scoreBadge.style.color = totalScore >= 85 ? '#166534' : (totalScore >= 55 ? '#b45309' : '#e11d48');
 
+    // Kiểm tra phối màu hài hòa trên bàn cắm
+    const harmony = this.evaluateColorHarmony(
+      this.state.workbench.flowers.map(f => f.id),
+      this.state.workbench.innerPaper,
+      this.state.workbench.paper,
+      this.state.workbench.ribbon,
+      cust.order.requiredTone
+    );
+    if (harmonyBadge) {
+      if (harmony.ready) {
+        harmonyBadge.style.display = 'block';
+        harmonyBadge.textContent = harmony.label;
+        harmonyBadge.className = `color-harmony-pill harmony-${harmony.level}`;
+      } else {
+        harmonyBadge.style.display = 'none';
+      }
+    }
+
     if (totalScore >= 95) {
-      feedbackText.textContent = '✨ Bó hoa hoàn hảo từng chi tiết! Khách sẽ cực kỳ ưng ý!';
+      feedbackText.textContent = '✨ Bó hoa hoàn hảo từng chi tiết! Bấm Giao để thắt nơ!';
     } else if (missingNotes.length > 0) {
       feedbackText.textContent = `⚠️ Lưu ý: ${missingNotes.slice(0, 2).join(' • ')}`;
     } else {
@@ -2261,13 +2643,16 @@ class FlowerShopGame {
       trimBadge.style.display = this.state.workbench.trimmed ? 'inline-block' : 'none';
     }
 
-    const estPrice = Math.round((cust.order.price * totalScore) / 100);
-    estPriceEl.textContent = `${estPrice} 🪙`;
+    const isExpressActive = cust.order.isExpress && !cust.isExpressExpired;
+    const expressMult = isExpressActive ? 2 : 1;
+    const harmonyBonusMult = harmony.ready ? (1 + harmony.bonusMult) : 1;
+    const estPrice = Math.round((cust.order.price * totalScore / 100) * expressMult * harmonyBonusMult);
+    estPriceEl.textContent = isExpressActive ? `${estPrice} 🪙 (x2)` : `${estPrice} 🪙`;
 
-    return { totalScore, estPrice };
+    return { totalScore, estPrice, harmony };
   }
 
-  // 8. GIAO HOA & THU TIỀN
+  // 8. MINI-GAME THẮT NƠ & GIAO HOA THU TIỀN
   deliverOrder() {
     if (this.state.phase !== 'OPEN' && this.state.phase !== 'CLOSING') {
       this.showToast('Tiệm đang chuẩn bị, hãy bấm "LẬT BIỂN: MỞ BÁN" để đón khách!');
@@ -2290,13 +2675,136 @@ class FlowerShopGame {
       return;
     }
 
-    const { totalScore, estPrice } = this.updateScoringChecklist();
-
+    const { totalScore } = this.updateScoringChecklist();
     if (totalScore < 50) {
       window.soundMgr.playCustomerSad();
       this.showToast('Bó hoa chưa đạt yêu cầu! Khách lắc đầu chưa muốn nhận.');
       return;
     }
+
+    this.openRibbonMinigame();
+  }
+
+  openRibbonMinigame() {
+    const overlay = document.getElementById('ribbon-minigame-overlay');
+    const previewEl = document.getElementById('rm-bouquet-preview');
+    const resultBanner = document.getElementById('rm-result-banner');
+    const cursorEl = document.getElementById('rm-cursor');
+    const tieBtn = document.getElementById('btn-rm-tie');
+    const skipBtn = document.getElementById('btn-rm-skip');
+    if (!overlay) {
+      this.finalizeDeliverOrder({ tier: 'normal', bonusMult: 0, bonusTip: 0, label: '' });
+      return;
+    }
+
+    if (previewEl) {
+      this.renderCompactBouquetSvg(previewEl, {
+        containerType: this.state.workbench.containerType,
+        flowers: this.state.workbench.flowers.map(f => f.id),
+        innerPaper: this.state.workbench.innerPaper,
+        paper: this.state.workbench.paper,
+        ribbon: this.state.workbench.ribbon
+      });
+    }
+
+    if (resultBanner) resultBanner.style.display = 'none';
+    if (tieBtn) tieBtn.disabled = false;
+    if (skipBtn) skipBtn.disabled = false;
+
+    this.ribbonMinigame.active = true;
+    this.ribbonMinigame.locked = false;
+    this.ribbonMinigame.pos = 15;
+    this.ribbonMinigame.dir = 1;
+    this.ribbonMinigame.lastTime = performance.now();
+    if (cursorEl) cursorEl.style.left = '15%';
+    overlay.style.display = 'flex';
+
+    const step = (now) => {
+      if (!this.ribbonMinigame.active || this.ribbonMinigame.locked) return;
+      const dt = Math.min(0.05, (now - this.ribbonMinigame.lastTime) / 1000);
+      this.ribbonMinigame.lastTime = now;
+      const speed = 135; // % mỗi giây
+      this.ribbonMinigame.pos += this.ribbonMinigame.dir * speed * dt;
+      if (this.ribbonMinigame.pos >= 94) {
+        this.ribbonMinigame.pos = 94;
+        this.ribbonMinigame.dir = -1;
+      } else if (this.ribbonMinigame.pos <= 6) {
+        this.ribbonMinigame.pos = 6;
+        this.ribbonMinigame.dir = 1;
+      }
+      if (cursorEl) cursorEl.style.left = `${this.ribbonMinigame.pos}%`;
+      this.ribbonMinigame.rafId = requestAnimationFrame(step);
+    };
+    cancelAnimationFrame(this.ribbonMinigame.rafId);
+    this.ribbonMinigame.rafId = requestAnimationFrame(step);
+  }
+
+  stopRibbonMinigame(skip = false) {
+    if (!this.ribbonMinigame.active || this.ribbonMinigame.locked) return;
+    this.ribbonMinigame.locked = true;
+    cancelAnimationFrame(this.ribbonMinigame.rafId);
+
+    const overlay = document.getElementById('ribbon-minigame-overlay');
+    const resultBanner = document.getElementById('rm-result-banner');
+    const tieBtn = document.getElementById('btn-rm-tie');
+    const skipBtn = document.getElementById('btn-rm-skip');
+    if (tieBtn) tieBtn.disabled = true;
+    if (skipBtn) skipBtn.disabled = true;
+
+    if (skip) {
+      this.ribbonMinigame.active = false;
+      if (overlay) overlay.style.display = 'none';
+      this.finalizeDeliverOrder({ tier: 'normal', bonusMult: 0, bonusTip: 0, label: '' });
+      return;
+    }
+
+    const pos = this.ribbonMinigame.pos;
+    let bowResult;
+    if (pos >= 41 && pos <= 59) {
+      bowResult = {
+        tier: 'perfect',
+        bonusMult: 0.25,
+        bonusTip: 8,
+        label: '✨ BÓ HOA HOÀN MỸ! (+25% giá & +8 🪙 boa)'
+      };
+      window.soundMgr.playPerfectBow();
+    } else if (pos >= 28 && pos <= 72) {
+      bowResult = {
+        tier: 'good',
+        bonusMult: 0.10,
+        bonusTip: 3,
+        label: '🎀 Thắt nơ khéo léo! (+10% giá & +3 🪙 boa)'
+      };
+      window.soundMgr.playWrapPaper();
+    } else {
+      bowResult = {
+        tier: 'normal',
+        bonusMult: 0,
+        bonusTip: 0,
+        label: '💐 Đã thắt nơ xong!'
+      };
+      window.soundMgr.playWrapPaper();
+    }
+
+    if (resultBanner) {
+      resultBanner.style.display = 'block';
+      resultBanner.className = `rm-result-banner ${bowResult.tier}`;
+      resultBanner.textContent = bowResult.label;
+    }
+
+    setTimeout(() => {
+      this.ribbonMinigame.active = false;
+      if (overlay) overlay.style.display = 'none';
+      this.finalizeDeliverOrder(bowResult);
+    }, 520);
+  }
+
+  finalizeDeliverOrder(bowResult = { tier: 'normal', bonusMult: 0, bonusTip: 0, label: '' }) {
+    const cust = this.state.customersQueue[this.state.activeCustomerIdx];
+    if (!cust) return;
+
+    const { totalScore, estPrice, harmony } = this.updateScoringChecklist();
+    if (totalScore < 50) return;
 
     // Trừ 1 tờ giấy lót trong, 1 tờ giấy gói ngoài & 1 dải ruy băng đã sử dụng từ kho nguyên liệu
     if (this.state.innerPaperStocks[this.state.workbench.innerPaper] > 0) {
@@ -2309,40 +2817,48 @@ class FlowerShopGame {
       this.state.ribbonStocks[this.state.workbench.ribbon]--;
     }
 
-    let bonusTip = 0;
-    const decorTipRate = this.getUpgradeBonus('shop_decor').tipBonus || 0;
+    const finalRevenue = Math.round(estPrice * (1 + (bowResult.bonusMult || 0)));
+    let bonusTip = bowResult.bonusTip || 0;
+    const decorTipRate = this.getAtmosphereTipBonus();
     const rushBonus = this.state.isRushHour ? 6 : 0;
+
     if (totalScore >= 85) {
-      bonusTip = Math.round(estPrice * 0.3) + 6;
+      bonusTip += Math.round(finalRevenue * 0.25) + 6;
       const tipBonusRate = this.getUpgradeBonus('golden_shears').tipBonus || 0;
-      if (tipBonusRate > 0) bonusTip += Math.round(estPrice * tipBonusRate);
-      if (decorTipRate > 0) bonusTip += Math.round(estPrice * decorTipRate);
-      if (cust.isVip) bonusTip += 10;
+      if (tipBonusRate > 0) bonusTip += Math.round(finalRevenue * tipBonusRate);
+      if (decorTipRate > 0) bonusTip += Math.round(finalRevenue * decorTipRate);
+      if (cust.isVip) bonusTip += 14;
+      if (cust.isChoosy && harmony && harmony.level === 'good') bonusTip += 12;
       if (this.state.workbench.trimmed) bonusTip += 5;
       bonusTip += rushBonus;
       window.soundMgr.playCustomerHappy();
       this.spawnHeartParticles();
     } else {
-      if (decorTipRate > 0) bonusTip += Math.round(estPrice * decorTipRate);
+      if (decorTipRate > 0) bonusTip += Math.round(finalRevenue * decorTipRate);
       if (this.state.workbench.trimmed) bonusTip += 5;
       bonusTip += rushBonus;
       window.soundMgr.playCoinChime();
     }
 
-    const totalEarned = estPrice + bonusTip;
+    const totalEarned = finalRevenue + bonusTip;
     this.state.gold += totalEarned;
     this.state.completedOrdersCount++;
     this.state.dayStats.orders++;
-    this.state.dayStats.revenue += estPrice;
+    this.state.dayStats.revenue += finalRevenue;
     this.state.dayStats.tips += bonusTip;
 
-    const starRating = (totalScore / 100) * 5;
+    const starRating = Math.min(5, (totalScore / 100) * 5 + (bowResult.tier === 'perfect' ? 0.3 : 0));
     this.state.dayStats.ratings.push(starRating);
-    this.state.reputation = parseFloat(((this.state.reputation * 0.8) + (starRating * 0.2)).toFixed(1));
+    const repGainBonus = (cust.isVip || cust.isChoosy) && totalScore >= 90 ? 0.1 : 0;
+    this.state.reputation = Math.min(5.0, parseFloat(((this.state.reputation * 0.8) + (starRating * 0.2) + repGainBonus).toFixed(1)));
 
     this.spawnCoinParticles();
-    const rushNote = rushBonus > 0 ? ` (🔥 +${rushBonus}🪙 Giờ Cao Điểm)` : '';
-    this.showToast(`+${totalEarned} 🪙${rushNote}! ${cust.meta.name}: "${cust.meta.dialogue}"`);
+    const tags = [];
+    if (cust.order.isExpress && !cust.isExpressExpired) tags.push('⚡ x2 Đơn Gấp');
+    if (bowResult.tier === 'perfect') tags.push('✨ Bó Hoa Hoàn Mỹ');
+    if (rushBonus > 0) tags.push(`🔥 +${rushBonus}🪙 Cao Điểm`);
+    const tagText = tags.length > 0 ? ` (${tags.join(' • ')})` : '';
+    this.showToast(`+${totalEarned} 🪙${tagText}! ${cust.meta.name}: "${cust.meta.dialogue}"`);
 
     this.clearWorkbench(false, true);
 
@@ -2542,7 +3058,9 @@ class FlowerShopGame {
   }
 
   updateCustomersPatience() {
-    const decorMult = this.getUpgradeBonus('shop_decor').patienceDecayMult || 1;
+    if (this.ribbonMinigame && this.ribbonMinigame.active) return;
+
+    const decorMult = this.getPatienceDecayMult();
     const decayPerTick = 1.2 * decorMult;
     let queueChanged = false;
 
@@ -2550,11 +3068,24 @@ class FlowerShopGame {
       const cust = this.state.customersQueue[i];
       cust.patience -= decayPerTick;
 
+      // Đếm ngược thời gian Đơn Hàng Gấp (nếu đang kích hoạt)
+      if (cust.order.isExpress && !cust.isExpressExpired) {
+        cust.expressTimeLeft = Math.max(0, cust.expressTimeLeft - 1.5);
+        if (cust.expressTimeLeft <= 0) {
+          cust.isExpressExpired = true;
+          cust.patience = Math.max(12, cust.patience - 10);
+          window.soundMgr.playCustomerSad();
+          this.showToast(`⏰ Hết giờ Đơn Gấp của ${cust.meta.name}! Mất thưởng x2 nhưng khách vẫn đợi thêm một chút.`);
+          queueChanged = true;
+        }
+      }
+
       if (cust.patience <= 0) {
         window.soundMgr.playCustomerSad();
         this.spawnAngryParticles();
-        this.showToast(`💢 ${cust.meta.name} đợi quá lâu nên giận dỗi bỏ đi! (-0.3 ⭐)`);
-        this.state.reputation = Math.max(1.0, parseFloat((this.state.reputation - 0.3).toFixed(1)));
+        const repPenalty = (cust.isVip || cust.isChoosy) ? 0.4 : 0.3;
+        this.showToast(`💢 ${cust.meta.name} đợi quá lâu nên giận dỗi bỏ đi! (-${repPenalty} ⭐)`);
+        this.state.reputation = Math.max(1.0, parseFloat((this.state.reputation - repPenalty).toFixed(1)));
         this.state.customersQueue.splice(i, 1);
         if (this.state.activeCustomerIdx >= this.state.customersQueue.length) {
           this.state.activeCustomerIdx = Math.max(0, this.state.customersQueue.length - 1);
@@ -2733,7 +3264,369 @@ class FlowerShopGame {
     if (goldEl) goldEl.textContent = `${this.state.gold} 🪙`;
     if (progEl) progEl.textContent = `${totalLevel} / ${totalMax} Cấp`;
 
+    this.renderAtmosphereItemsList();
     this.renderUpgradeFlowersList();
+  }
+
+  renderAtmosphereItemsList() {
+    const container = document.getElementById('upgrade-atmosphere-container');
+    if (!container || typeof ATMOSPHERE_ITEMS_DATA === 'undefined') return;
+    container.innerHTML = '';
+
+    ATMOSPHERE_ITEMS_DATA.forEach(item => {
+      const owned = !!(this.state.atmosphereItems && this.state.atmosphereItems[item.id]);
+      const canAfford = this.state.gold >= item.cost;
+      const card = document.createElement('div');
+      card.className = `atmo-card ${owned ? 'owned' : ''}`;
+      card.innerHTML = `
+        <div>
+          <div class="atmo-top">
+            <div class="atmo-icon">${item.icon}</div>
+            <div>
+              <div class="atmo-title">${item.name}</div>
+              <div class="atmo-desc">${item.desc}</div>
+            </div>
+          </div>
+          <div class="atmo-effect" style="margin-top: 6px;">✨ ${item.effectLabel}</div>
+        </div>
+        <div>
+          ${owned
+            ? '<div class="atmo-owned-badge">✅ Đã trưng bày tại quầy tiệm</div>'
+            : `<button class="atmo-buy-btn ${!canAfford ? 'insufficient' : ''}">🛋️ Mua & Trang Trí (${item.cost} 🪙)</button>`
+          }
+        </div>
+      `;
+      const btn = card.querySelector('.atmo-buy-btn');
+      if (btn) {
+        btn.addEventListener('click', () => this.purchaseAtmosphereItem(item));
+      }
+      container.appendChild(card);
+    });
+  }
+
+  purchaseAtmosphereItem(item) {
+    if (this.state.atmosphereItems && this.state.atmosphereItems[item.id]) {
+      this.showToast(`${item.name} đã có trong tiệm rồi!`);
+      return;
+    }
+    if (this.state.gold < item.cost) {
+      window.soundMgr.playCustomerSad();
+      this.showToast(`Chưa đủ xu! Cần ${item.cost} 🪙 để mua ${item.name}.`);
+      return;
+    }
+    this.state.gold -= item.cost;
+    if (!this.state.atmosphereItems) this.state.atmosphereItems = {};
+    this.state.atmosphereItems[item.id] = true;
+
+    if (item.id === 'lofi_radio' && !window.soundMgr.musicEnabled) {
+      window.soundMgr.toggleMusic();
+      const topMusicBtn = document.getElementById('btn-music-toggle');
+      if (topMusicBtn) {
+        topMusicBtn.querySelector('.icon').textContent = '🎵';
+        topMusicBtn.style.color = '#2d6a4f';
+      }
+    }
+
+    window.soundMgr.playLevelUp();
+    this.renderShopDecorVisual();
+    this.renderUpgradesList();
+    this.updateHUD();
+    this.saveGameData();
+    this.showToast(`${item.icon} Đã trang trí ${item.name}! Khách sẽ kiên nhẫn chờ lâu hơn.`);
+  }
+
+  // CHIA SẺ HÀM VẼ BÓ HOA THU GỌN CHO MINI-GAME THẮT NƠ & XƯỞNG SÁNG TẠO DIY
+  renderCompactBouquetSvg(containerEl, spec) {
+    if (!containerEl) return;
+    const { containerType, flowers, innerPaper, paper, ribbon } = spec;
+    const isBox = containerType === 'box';
+    const innerObj = DECOR_DATA.innerPapers.find(p => p.id === innerPaper);
+    const paperObj = DECOR_DATA.papers.find(p => p.id === paper);
+    const ribbonObj = DECOR_DATA.ribbons.find(r => r.id === ribbon);
+
+    let backSvg = '';
+    if (isBox) {
+      if (paperObj) backSvg += `<ellipse cx="130" cy="148" rx="68" ry="12" fill="${paperObj.border}"/>`;
+      if (innerObj) {
+        backSvg += `<path d="M62,150 Q78,120 96,136 Q114,116 130,134 Q146,116 164,136 Q182,120 198,150 L186,162 L74,162 Z" fill="${innerObj.color}" stroke="${innerObj.border}" stroke-width="1.6"/>`;
+      }
+    } else {
+      if (paperObj) {
+        backSvg += `<polygon points="130,242 46,112 130,28 214,112" fill="${paperObj.innerFold || '#f8fafc'}"/>`;
+      }
+      if (innerObj) {
+        backSvg += `<path d="M130,238 L60,118 Q76,74 96,86 Q112,56 130,74 Q148,56 164,86 Q184,74 200,118 Z" fill="${innerObj.color}" stroke="${innerObj.border}" stroke-width="1.6"/>`;
+      }
+    }
+
+    let frontSvg = '';
+    if (isBox && paperObj) {
+      frontSvg = `
+        <path d="M62,150 Q130,164 198,150 L194,252 Q130,270 66,252 Z" fill="${paperObj.color}" stroke="${paperObj.border}" stroke-width="2"/>
+        <ellipse cx="130" cy="150" rx="68" ry="10" fill="none" stroke="${paperObj.border}" stroke-width="2"/>
+      `;
+    } else if (paperObj) {
+      frontSvg = `
+        <polygon points="130,244 46,112 130,148" fill="${paperObj.color}" stroke="${paperObj.border}" stroke-width="1.8"/>
+        <polygon points="130,244 214,112 130,148" fill="${paperObj.color}" stroke="${paperObj.border}" stroke-width="1.8"/>
+        <polygon points="130,244 106,274 154,274" fill="${paperObj.color}" stroke="${paperObj.border}" stroke-width="1.8"/>
+      `;
+    }
+
+    let ribbonSvg = '';
+    if (ribbonObj) {
+      if (isBox) {
+        ribbonSvg = `
+          <path d="M64,196 Q130,210 196,196 L196,210 Q130,224 64,210 Z" fill="${ribbonObj.color}"/>
+          <circle cx="130" cy="208" r="6" fill="${ribbonObj.accentColor || ribbonObj.color}"/>
+        `;
+      } else {
+        ribbonSvg = `
+          <rect x="116" y="236" width="28" height="7" rx="3.5" fill="${ribbonObj.color}"/>
+          <path d="M130,239 C112,226 108,246 126,242 Z" fill="${ribbonObj.color}"/>
+          <path d="M130,239 C148,226 152,246 134,242 Z" fill="${ribbonObj.color}"/>
+          <circle cx="130" cy="240" r="4.5" fill="${ribbonObj.accentColor || ribbonObj.color}"/>
+        `;
+      }
+    }
+
+    const spreadAngles = [0, -15, 15, -26, 26, -8, 8, -21, 21, 0];
+    let flowersHtml = '';
+    (flowers || []).slice(0, 10).forEach((fId, idx) => {
+      const flw = FLOWERS_DATA[fId];
+      if (!flw) return;
+      const ang = spreadAngles[idx % spreadAngles.length];
+      const rad = (ang * Math.PI) / 180;
+      const dx = Math.sin(rad) * 26;
+      const dy = (1 - Math.cos(rad)) * 10 - (idx % 2 === 0 ? 4 : 0);
+      flowersHtml += `
+        <div style="position:absolute; left:calc(50% + ${dx}px); bottom:${isBox ? 32 : 36}px; width:48px; height:64px; transform:translateX(-50%) translateY(${dy}px) rotate(${ang}deg); transform-origin:50% 90%; z-index:${12 + idx}; pointer-events:none;">
+          ${flw.svg}
+        </div>
+      `;
+    });
+
+    containerEl.innerHTML = `
+      <svg viewBox="0 0 260 280" preserveAspectRatio="xMidYMax meet" style="width:100%; height:100%; position:absolute; inset:0; z-index:5;">${backSvg}</svg>
+      ${flowersHtml}
+      <svg viewBox="0 0 260 280" preserveAspectRatio="xMidYMax meet" style="width:100%; height:100%; position:absolute; inset:0; z-index:25;">${frontSvg}${ribbonSvg}</svg>
+    `;
+  }
+
+  // GÓC SÁNG TẠO & PHÁT MINH MẪU BÓ HOA ĐỘC QUYỀN (DIY WORKSHOP)
+  openDiyWorkshop() {
+    this.renderDiyWorkshop();
+    this.openModal('modal-diy');
+  }
+
+  renderDiyWorkshop() {
+    const flowersWrap = document.getElementById('diy-flowers-picker');
+    const innerWrap = document.getElementById('diy-inner-list');
+    const paperWrap = document.getElementById('diy-paper-list');
+    const ribbonWrap = document.getElementById('diy-ribbon-list');
+    if (!flowersWrap || !innerWrap || !paperWrap || !ribbonWrap) return;
+
+    const available = Object.values(FLOWERS_DATA).filter(f => this.isFlowerUnlocked(f.id));
+    flowersWrap.innerHTML = '';
+    available.forEach(flower => {
+      const qty = this.diyDraft.flowers[flower.id] || 0;
+      const card = document.createElement('div');
+      card.className = `diy-flower-card ${qty > 0 ? 'selected' : ''}`;
+      card.innerHTML = `
+        <div class="diy-flw-svg">${flower.svg}</div>
+        <div class="diy-flw-name">${flower.name}</div>
+        <div class="diy-qty-ctrl">
+          <button class="diy-qty-btn minus">-</button>
+          <span class="diy-qty-val">${qty}</span>
+          <button class="diy-qty-btn plus">+</button>
+        </div>
+      `;
+      card.querySelector('.minus').addEventListener('click', () => {
+        if ((this.diyDraft.flowers[flower.id] || 0) > 0) {
+          this.diyDraft.flowers[flower.id]--;
+          if (this.diyDraft.flowers[flower.id] <= 0) delete this.diyDraft.flowers[flower.id];
+          this.renderDiyWorkshop();
+        }
+      });
+      card.querySelector('.plus').addEventListener('click', () => {
+        const curTypes = Object.keys(this.diyDraft.flowers).length;
+        const totalStems = Object.values(this.diyDraft.flowers).reduce((s, n) => s + n, 0);
+        if (!this.diyDraft.flowers[flower.id] && curTypes >= 3) {
+          this.showToast('Mỗi mẫu sáng tạo tối đa kết hợp 3 loài hoa!');
+          return;
+        }
+        if (totalStems >= 10) {
+          this.showToast('Tối đa 10 cành hoa trong một mẫu bó!');
+          return;
+        }
+        this.diyDraft.flowers[flower.id] = (this.diyDraft.flowers[flower.id] || 0) + 1;
+        window.soundMgr.playPickFlower();
+        this.renderDiyWorkshop();
+      });
+      flowersWrap.appendChild(card);
+    });
+
+    const renderChips = (el, items, currentVal, onSelect) => {
+      el.innerHTML = '';
+      items.forEach(it => {
+        const chip = document.createElement('button');
+        chip.className = `diy-chip ${currentVal === it.id ? 'active' : ''}`;
+        chip.innerHTML = `<span class="diy-chip-dot" style="background:${it.color}"></span><span>${it.name}</span>`;
+        chip.addEventListener('click', () => {
+          onSelect(it.id);
+          window.soundMgr.playWrapPaper();
+          this.renderDiyWorkshop();
+        });
+        el.appendChild(chip);
+      });
+    };
+
+    renderChips(innerWrap, DECOR_DATA.innerPapers, this.diyDraft.innerPaper, (id) => { this.diyDraft.innerPaper = id; });
+    renderChips(paperWrap, DECOR_DATA.papers, this.diyDraft.paper, (id) => { this.diyDraft.paper = id; });
+    renderChips(ribbonWrap, DECOR_DATA.ribbons, this.diyDraft.ribbon, (id) => { this.diyDraft.ribbon = id; });
+
+    this.renderDiyPreview();
+    this.renderDiyMenuList();
+  }
+
+  renderDiyPreview() {
+    const stage = document.getElementById('diy-preview-stage');
+    const harmonyEl = document.getElementById('diy-harmony-status');
+    const priceEl = document.getElementById('diy-est-price');
+    const expandedFlowers = [];
+    let baseCost = 0;
+
+    Object.keys(this.diyDraft.flowers).forEach(fId => {
+      const cnt = this.diyDraft.flowers[fId];
+      const fMeta = FLOWERS_DATA[fId];
+      for (let i = 0; i < cnt; i++) {
+        expandedFlowers.push(fId);
+        if (fMeta) baseCost += fMeta.basePrice;
+      }
+    });
+
+    if (stage) {
+      if (expandedFlowers.length === 0) {
+        stage.innerHTML = '<div style="font-size:11.5px; color:#64748b; font-weight:800; text-align:center; padding:10px;">Hãy chọn ít nhất 1 cành hoa bên trái để tạo mẫu bó độc quyền!</div>';
+      } else {
+        this.renderCompactBouquetSvg(stage, {
+          containerType: this.diyDraft.containerType,
+          flowers: expandedFlowers,
+          innerPaper: this.diyDraft.innerPaper,
+          paper: this.diyDraft.paper,
+          ribbon: this.diyDraft.ribbon
+        });
+      }
+    }
+
+    const harmony = this.evaluateColorHarmony(
+      expandedFlowers,
+      this.diyDraft.innerPaper,
+      this.diyDraft.paper,
+      this.diyDraft.ribbon
+    );
+    if (harmonyEl) {
+      if (expandedFlowers.length === 0) {
+        harmonyEl.textContent = '🎨 Chọn hoa và giấy gói để phân tích phối màu';
+        harmonyEl.className = 'diy-harmony-pill';
+      } else {
+        harmonyEl.textContent = harmony.label;
+        harmonyEl.className = `diy-harmony-pill ${harmony.level === 'good' ? 'good' : ''}`;
+      }
+    }
+
+    const diyMult = harmony.level === 'good' ? 1.45 : 1.35;
+    const estPrice = expandedFlowers.length > 0 ? Math.round((baseCost + 18) * diyMult) : 0;
+    if (priceEl) priceEl.textContent = `${estPrice} 🪙`;
+    return { estPrice, harmony, expandedFlowers };
+  }
+
+  saveDiyRecipe() {
+    if ((this.state.customRecipes || []).length >= 6) {
+      this.showToast('Menu Độc Quyền tối đa 6 mẫu! Hãy xóa bớt mẫu cũ nếu muốn thêm mới.');
+      return;
+    }
+
+    const { estPrice, harmony, expandedFlowers } = this.renderDiyPreview();
+    if (expandedFlowers.length === 0) {
+      this.showToast('Hãy chọn ít nhất 1 bông hoa trước khi thêm vào Menu!');
+      return;
+    }
+
+    const nameInput = document.getElementById('diy-recipe-name');
+    const rawName = nameInput ? nameInput.value.trim() : '';
+    const recipeName = rawName || `Bó Độc Quyền #${(this.state.customRecipes || []).length + 1}`;
+
+    const signatureKey = JSON.stringify({
+      f: Object.keys(this.diyDraft.flowers).sort().map(k => `${k}:${this.diyDraft.flowers[k]}`),
+      c: this.diyDraft.containerType,
+      i: this.diyDraft.innerPaper,
+      p: this.diyDraft.paper,
+      r: this.diyDraft.ribbon
+    });
+
+    const isDuplicate = (this.state.customRecipes || []).some(r => r.signatureKey === signatureKey);
+    if (isDuplicate) {
+      this.showToast('Công thức kết hợp này đã có trong Menu rồi! Hãy thử biến tấu khác nhé.');
+      return;
+    }
+
+    if (!this.state.customRecipes) this.state.customRecipes = [];
+    this.state.customRecipes.push({
+      id: 'diy_' + Date.now(),
+      name: recipeName,
+      signatureKey: signatureKey,
+      containerType: this.diyDraft.containerType,
+      flowers: { ...this.diyDraft.flowers },
+      innerPaper: this.diyDraft.innerPaper,
+      paper: this.diyDraft.paper,
+      ribbon: this.diyDraft.ribbon,
+      toneId: harmony.toneId || null,
+      price: estPrice
+    });
+
+    if (nameInput) nameInput.value = '';
+    window.soundMgr.playDiscovery();
+    this.saveGameData();
+    this.renderDiyMenuList();
+    this.showToast(`💡 Đã phát minh mẫu "${recipeName}" (${estPrice} 🪙) & thêm vào Menu bán hàng!`);
+  }
+
+  renderDiyMenuList() {
+    const listEl = document.getElementById('diy-menu-list');
+    const countEl = document.getElementById('diy-menu-count');
+    const recipes = this.state.customRecipes || [];
+    if (countEl) countEl.textContent = recipes.length;
+    if (!listEl) return;
+
+    if (recipes.length === 0) {
+      listEl.innerHTML = '<div style="font-size:11px; color:#64748b; text-align:center; padding:8px;">Chưa có mẫu độc quyền nào. Hãy tự tay phối hoa và đặt tên!</div>';
+      return;
+    }
+
+    listEl.innerHTML = '';
+    recipes.forEach((rec, idx) => {
+      const flwText = Object.keys(rec.flowers).map(id => `${FLOWERS_DATA[id]?.name || id} x${rec.flowers[id]}`).join(', ');
+      const item = document.createElement('div');
+      item.className = 'diy-menu-item';
+      item.innerHTML = `
+        <div class="diy-menu-info">
+          <strong>🌟 ${rec.name}</strong>
+          <small>${flwText}</small>
+        </div>
+        <div class="diy-menu-actions">
+          <span class="diy-menu-price">${rec.price} 🪙</span>
+          <button class="diy-del-btn" title="Xóa khỏi Menu">Xóa</button>
+        </div>
+      `;
+      item.querySelector('.diy-del-btn').addEventListener('click', () => {
+        this.state.customRecipes.splice(idx, 1);
+        this.saveGameData();
+        this.renderDiyMenuList();
+        this.showToast(`Đã gỡ "${rec.name}" khỏi Menu.`);
+      });
+      listEl.appendChild(item);
+    });
   }
 
   renderUpgradeFlowersList() {

@@ -1051,3 +1051,157 @@ const UPGRADES_DATA = [
     ]
   }
 ];
+
+// 6. HỆ THỐNG PHỐI MÀU & TÔNG BÓ HOA (COLOR HARMONY)
+const COLOR_TONE_META = {
+  romantic: {
+    id: 'romantic',
+    name: 'Lãng Mạn Đỏ - Hồng',
+    badge: '🌹 Tông Lãng Mạn',
+    hint: 'Phối hợp hoa đỏ/hồng cùng lụa phấn/trắng & giấy Hồng hoặc Đỏ Đô',
+    accent: '#e11d48'
+  },
+  pastel: {
+    id: 'pastel',
+    name: 'Pastel Ngọt Ngào',
+    badge: '🌸 Tông Pastel',
+    hint: 'Ưu tiên lụa nhẹ, giấy Hồng Pastel / Xanh Mint / Tím Lavender / Trắng',
+    accent: '#ec4899'
+  },
+  sunny: {
+    id: 'sunny',
+    name: 'Năng Lượng Rực Rỡ',
+    badge: '☀️ Tông Rực Rỡ',
+    hint: 'Hợp giấy Vàng Kem / Kraft Vintage / Trắng & nơ Vàng Gold',
+    accent: '#d97706'
+  },
+  elegant: {
+    id: 'elegant',
+    name: 'Sang Trọng Quý Phái',
+    badge: '👑 Tông Sang Trọng',
+    hint: 'Hợp lụa Trắng / Tím, giấy Trắng Tuyết / Đỏ Đô / Lavender & nơ Gold/Trắng',
+    accent: '#7e22ce'
+  }
+};
+
+const FLOWER_TONES_MAP = {
+  red_rose: ['romantic', 'elegant'],
+  white_rose: ['pastel', 'elegant', 'romantic'],
+  daisy: ['pastel', 'sunny'],
+  baby_breath: ['pastel', 'romantic', 'elegant', 'sunny'],
+  sunflower: ['sunny'],
+  tulip_pink: ['pastel', 'romantic'],
+  tulip_red: ['romantic', 'elegant'],
+  carnation: ['romantic', 'pastel'],
+  lavender: ['elegant', 'pastel'],
+  gerbera: ['sunny', 'romantic'],
+  pompon_mum: ['elegant', 'pastel'],
+  dahlia: ['romantic', 'elegant'],
+  lily_white: ['elegant', 'pastel'],
+  peony: ['romantic', 'pastel', 'elegant'],
+  hydrangea: ['pastel', 'elegant'],
+  lotus: ['pastel', 'elegant'],
+  orchid: ['elegant', 'romantic'],
+  cherry_blossom: ['pastel', 'romantic']
+};
+
+Object.keys(FLOWER_TONES_MAP).forEach(id => {
+  if (FLOWERS_DATA[id]) {
+    FLOWERS_DATA[id].tones = FLOWER_TONES_MAP[id];
+  }
+});
+
+const DECOR_TONES_MAP = {
+  innerPapers: {
+    silk_white: ['romantic', 'pastel', 'sunny', 'elegant'],
+    silk_blush: ['romantic', 'pastel'],
+    silk_cream: ['sunny', 'pastel', 'elegant'],
+    silk_mint: ['pastel', 'sunny'],
+    silk_lavender: ['elegant', 'pastel'],
+    silk_peach: ['sunny', 'romantic', 'pastel']
+  },
+  papers: {
+    pink_pastel: ['pastel', 'romantic'],
+    kraft_vintage: ['sunny', 'romantic', 'elegant'],
+    snow_white: ['pastel', 'elegant', 'romantic', 'sunny'],
+    mint_green: ['pastel', 'sunny'],
+    lavender_mist: ['elegant', 'pastel'],
+    wine_red_paper: ['romantic', 'elegant'],
+    cream_yellow: ['sunny', 'pastel']
+  },
+  ribbons: {
+    wine_red: ['romantic', 'elegant'],
+    baby_pink: ['pastel', 'romantic'],
+    pearl_white: ['pastel', 'elegant', 'romantic', 'sunny'],
+    golden_satin: ['elegant', 'sunny', 'romantic'],
+    pastel_blue: ['pastel', 'sunny'],
+    soft_purple: ['elegant', 'pastel']
+  }
+};
+
+Object.keys(DECOR_TONES_MAP).forEach(group => {
+  if (DECOR_DATA[group]) {
+    DECOR_DATA[group].forEach(item => {
+      item.tones = DECOR_TONES_MAP[group][item.id] || ['pastel'];
+    });
+  }
+});
+
+// 7. VẬT PHẨM TRANG TRÍ KHÔNG GIAN TIỆM HOA (SHOP ATMOSPHERE)
+const ATMOSPHERE_ITEMS_DATA = [
+  {
+    id: 'lofi_radio',
+    name: 'Radio Lofi Cổ Điển',
+    icon: '📻',
+    cost: 45,
+    desc: 'Đặt chiếc radio gỗ phát nhạc thư giãn ngay góc quầy (bấm trực tiếp vào radio để bật/tắt nhạc).',
+    effectLabel: 'Giảm 10% tốc độ tụt kiên nhẫn • +5% tiền boa',
+    patienceReduction: 0.10,
+    rushBonusReduction: 0.04,
+    tipBonus: 0.05
+  },
+  {
+    id: 'fairy_lights',
+    name: 'Đèn Nhấp Nháy Ấm Áp',
+    icon: '💡',
+    cost: 55,
+    desc: 'Treo dây đèn vàng hồng lung linh khắp quầy hoa, giúp không gian ấm cúng vào giờ cao điểm.',
+    effectLabel: 'Giảm 12% tụt kiên nhẫn (giảm thêm 6% lúc Cao Điểm)',
+    patienceReduction: 0.12,
+    rushBonusReduction: 0.06,
+    tipBonus: 0.04
+  },
+  {
+    id: 'cozy_rug',
+    name: 'Thảm Trải Sàn Hoa Cúc',
+    icon: '🧶',
+    cost: 65,
+    desc: 'Thảm dệt thủ công êm ái dưới chân quầy giúp khách xếp hàng thư thái hơn.',
+    effectLabel: 'Giảm 10% tốc độ tụt kiên nhẫn • +6% tiền boa',
+    patienceReduction: 0.10,
+    rushBonusReduction: 0.04,
+    tipBonus: 0.06
+  },
+  {
+    id: 'corner_plants',
+    name: 'Chậu Cây Monstera & Sen Đá',
+    icon: '🪴',
+    cost: 75,
+    desc: 'Những chậu cây xanh mướt đặt cạnh quầy làm dịu mát không khí cho khách chờ.',
+    effectLabel: 'Giảm 12% tốc độ tụt kiên nhẫn • +6% tiền boa',
+    patienceReduction: 0.12,
+    rushBonusReduction: 0.04,
+    tipBonus: 0.06
+  },
+  {
+    id: 'sleepy_cat',
+    name: 'Mèo Cưng Ngủ Trưa Góc Quầy',
+    icon: '🐱',
+    cost: 95,
+    desc: 'Bé mèo mướp cuộn tròn ngủ gật cạnh bảng kẹp đơn! Khách mê mẩn ngắm mèo nên đợi rất kiên nhẫn (bấm để vuốt ve!).',
+    effectLabel: 'Giảm 16% tụt kiên nhẫn • +10% tiền boa • Tương tác được!',
+    patienceReduction: 0.16,
+    rushBonusReduction: 0.08,
+    tipBonus: 0.10
+  }
+];

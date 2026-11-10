@@ -70,6 +70,7 @@
           <button class="hud-btn" id="btn-fullscreen-toggle" title="Toàn Màn Hình"><span class="icon">⛶</span></button>
           <button class="hud-btn" id="btn-sound-toggle" title="Âm thanh"><span class="icon">🔊</span></button>
           <button class="hud-btn" id="btn-music-toggle" title="Nhạc Lofi Cozy"><span class="icon">🎵</span></button>
+          <button class="hud-btn" id="btn-diy-workshop" title="Góc Sáng Tạo Mẫu Hoa Mới"><span class="icon">🎨</span> Sáng Tạo</button>
           <button class="hud-btn" id="btn-inventory-restock"><span class="icon">📦</span> Nhập Hoa</button>
           <button class="hud-btn" id="btn-upgrade-shop"><span class="icon">✨</span> Nâng Cấp</button>
           <button class="hud-btn" id="btn-tutorial-open"><span class="icon">📖</span> Hướng Dẫn</button>
@@ -212,6 +213,12 @@
           <div id="order-clipboard-stand">
             <div class="clipboard-clamp"></div>
 
+            <!-- DẢI CẢNH BÁO ĐƠN HÀNG GẤP / YÊU CẦU TÔNG MÀU / MẪU ĐỘC QUYỀN -->
+            <div class="ticket-special-strip" id="ticket-special-strip" style="display: none;">
+              <span class="ticket-special-badge" id="ticket-special-badge">⚡ ĐƠN GẤP • x2 THƯỞNG</span>
+              <span class="ticket-express-timer" id="ticket-express-timer" style="display: none;">⏱️ 45s</span>
+            </div>
+
             <!-- ĐƠN HÀNG RÕ RÀNG CỦA KHÁCH ĐẦU QUẦY -->
             <div class="clipboard-active-order-view" id="clipboard-active-order-view" style="display: none;">
               <div class="active-ticket-header">
@@ -234,6 +241,9 @@
                 </div>
                 <span class="ticket-patience-txt" id="active-patience-txt">Đang kiên nhẫn</span>
               </div>
+
+              <!-- Yêu cầu phối màu hoặc tên mẫu độc quyền nếu có -->
+              <div class="ticket-tone-req-row" id="ticket-tone-req-row" style="display: none;"></div>
 
               <!-- Danh sách hoa yêu cầu có ảnh to -->
               <div class="ticket-req-flowers-list" id="ticket-req-flowers-list">
@@ -285,6 +295,7 @@
             <div class="customer-queue-area" id="customer-queue-area">
               <!-- Khách hàng hoạt hình đứng chờ, chỉ người đứng quầy mới hiện đơn ở bảng kẹp phía trên -->
             </div>
+            <div class="shop-counter-props" id="shop-counter-props"></div>
             <div class="counter-front-bar">
               <span>🌿 QUẦY GIAO DỊCH HOA TƯƠI</span>
             </div>
@@ -421,6 +432,7 @@
               <div class="score-row" id="chk-card"><span class="dot">⚪</span> Thiệp: <span class="val">0/10đ</span></div>
             </div>
 
+            <div class="color-harmony-pill" id="color-harmony-badge" style="display: none;">🎨 Phối màu: Hài hòa</div>
             <div class="score-feedback" id="order-feedback-text">Cắm hoa theo yêu cầu trên bảng kẹp</div>
 
             <div class="price-row">
@@ -437,6 +449,28 @@
 
       </footer>
 
+      <!-- MINI-GAME THẮT NƠ THỦ CÔNG TRƯỚC KHI GIAO -->
+      <div id="ribbon-minigame-overlay" class="ribbon-minigame-overlay" style="display: none;">
+        <div class="ribbon-minigame-card">
+          <div class="rm-header">
+            <span class="rm-badge">🎀 MINI-GAME THỦ CÔNG</span>
+            <h4>Thắt Nơ Hoàn Mỹ Cho Bó Hoa!</h4>
+            <p id="rm-subtitle">Bấm đúng lúc mũi tên vào vùng ✨ Vàng để tạo Bó Hoa Hoàn Mỹ (+25% giá trị)</p>
+          </div>
+          <div class="rm-bouquet-preview" id="rm-bouquet-preview"></div>
+          <div class="rm-track-wrap" id="rm-track-wrap">
+            <div class="rm-zone-good"></div>
+            <div class="rm-zone-perfect"><span>✨ HOÀN MỸ ✨</span></div>
+            <div class="rm-cursor" id="rm-cursor">🎀</div>
+          </div>
+          <div class="rm-result-banner" id="rm-result-banner" style="display: none;"></div>
+          <div class="rm-actions">
+            <button class="rm-tie-btn" id="btn-rm-tie">🎀 THẮT NƠ NGAY!</button>
+            <button class="rm-skip-btn" id="btn-rm-skip">Giao nhanh</button>
+          </div>
+        </div>
+      </div>
+
       <!-- BÓNG KÉO THẢ HOA MƯỢT MÀ -->
       <div id="drag-flower-ghost" style="display: none;"></div>
 
@@ -446,12 +480,12 @@
       <!-- TOAST THÔNG BÁO -->
       <div id="game-toast"></div>
 
-      <!-- MODALS: NÂNG CẤP, CHỢ SỈ, HƯỚNG DẪN, KẾT THÚC NGÀY -->
+      <!-- MODALS: NÂNG CẤP, CHỢ SỈ, HƯỚNG DẪN, KẾT THÚC NGÀY, SÁNG TẠO -->
       <div class="game-modal" id="modal-upgrade">
         <div class="modal-backdrop"></div>
         <div class="modal-dialog upgrade-dialog">
           <div class="modal-header">
-            <h3>✨ Nâng Cấp & Mở Rộng Tiệm Hoa</h3>
+            <h3>✨ Nâng Cấp & Trang Trí Tiệm Hoa</h3>
             <button class="modal-close-btn">&times;</button>
           </div>
           <div class="modal-body">
@@ -466,11 +500,79 @@
               </div>
             </div>
             <div class="upgrade-modal-tabs">
-              <button class="upg-tab-btn active" data-upg-tab="furniture">🛋️ Nội Thất & Dụng Cụ</button>
+              <button class="upg-tab-btn active" data-upg-tab="furniture">🛠️ Dụng Cụ & Quầy</button>
+              <button class="upg-tab-btn" data-upg-tab="atmosphere">🛋️ Trang Trí Tiệm</button>
               <button class="upg-tab-btn" data-upg-tab="flowers">🌸 Giống Hoa Cao Cấp</button>
             </div>
             <div class="upgrade-list" id="upgrade-items-container"></div>
+            <div class="upgrade-atmosphere-grid" id="upgrade-atmosphere-container" style="display: none;"></div>
             <div class="upgrade-flowers-grid" id="upgrade-flowers-container" style="display: none;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL GÓC SÁNG TẠO & NGHIÊN CỨU MẪU HOA ĐỘC QUYỀN (DIY WORKSHOP) -->
+      <div class="game-modal" id="modal-diy">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog diy-dialog">
+          <div class="modal-header">
+            <h3>🎨 Góc Sáng Tạo & Chế Tạo Mẫu Hoa Độc Quyền</h3>
+            <button class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body diy-body-grid">
+            <!-- CỘT TRÁI: CHỌN HOA & VẬT LIỆU TỰ CHẾ -->
+            <div class="diy-builder-col">
+              <div class="diy-section-title">
+                <span>1. Kiểu Dáng & Chọn 1–3 Loài Hoa (Tối đa 10 cành)</span>
+                <div class="diy-style-switch" id="diy-style-switch">
+                  <button class="diy-style-btn active" data-diy-style="cone">💐 Bó Nón</button>
+                  <button class="diy-style-btn" data-diy-style="box">🎁 Hộp Tròn</button>
+                </div>
+              </div>
+              <div class="diy-flowers-picker" id="diy-flowers-picker"></div>
+
+              <div class="diy-section-title">2. Phối Giấy Lót, Giấy Ngoài & Ruy Băng</div>
+              <div class="diy-decor-rows">
+                <div class="diy-decor-group">
+                  <small>Lót trong:</small>
+                  <div class="diy-chips-row" id="diy-inner-list"></div>
+                </div>
+                <div class="diy-decor-group">
+                  <small>Giấy ngoài:</small>
+                  <div class="diy-chips-row" id="diy-paper-list"></div>
+                </div>
+                <div class="diy-decor-group">
+                  <small>Ruy băng:</small>
+                  <div class="diy-chips-row" id="diy-ribbon-list"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CỘT PHẢI: XEM TRƯỚC, ĐẶT TÊN & MENU ĐỘC QUYỀN -->
+            <div class="diy-preview-col">
+              <div class="diy-preview-box">
+                <div class="diy-preview-stage" id="diy-preview-stage"></div>
+                <div class="diy-preview-meta">
+                  <div class="diy-harmony-pill" id="diy-harmony-status">🎨 Chọn hoa và giấy gói để xem độ hài hòa</div>
+                  <div class="diy-price-line">
+                    <span>Giá bán Menu (+35% độc quyền):</span>
+                    <strong id="diy-est-price">0 🪙</strong>
+                  </div>
+                  <div class="diy-save-row">
+                    <input type="text" id="diy-recipe-name" maxlength="26" placeholder="Đặt tên mẫu hoa (vd: Nắng Mai)..." />
+                    <button class="diy-save-btn" id="btn-diy-save">💡 Thêm Vào Menu</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="diy-menu-section">
+                <div class="diy-menu-header">
+                  <strong>📖 Menu Độc Quyền Của Tiệm (<span id="diy-menu-count">0</span>/6)</strong>
+                  <small>Khách sẽ ghé đặt các mẫu bạn phát minh với giá cao hơn!</small>
+                </div>
+                <div class="diy-menu-list" id="diy-menu-list"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
