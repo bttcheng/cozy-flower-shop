@@ -3793,3 +3793,69 @@ body.mobile-portrait .restock-grid {
 body.mobile-portrait .day-stats {
   grid-template-columns: repeat(2, 1fr);
 }
+
+/* ==========================================================================
+   6. TỐI ƯU MÀN HÌNH NGANG CHO TOÀN BỘ THIẾT BỊ (PHONES, TABLETS 4:3, DESKTOP)
+   ========================================================================== */
+body.landscape-mode #morning-prep-screen,
+body.landscape-mode #main-playfield {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+body.landscape-mode .wooden-shelf-rack {
+  flex: 1;
+  justify-content: space-evenly;
+}
+
+/* Bảo vệ nội dung khỏi tai thỏ / Dynamic Island & thanh home khi xoay ngang */
+body.landscape-mode #top-hud,
+body.landscape-mode #event-ticker,
+body.landscape-mode #morning-prep-screen,
+body.landscape-mode #workbench-area {
+  padding-left: max(14px, calc(env(safe-area-inset-left) * var(--inv-scale, 1)));
+  padding-right: max(14px, calc(env(safe-area-inset-right) * var(--inv-scale, 1)));
+}
+body.landscape-mode #customer-area {
+  padding-left: max(10px, calc(env(safe-area-inset-left) * var(--inv-scale, 1)));
+}
+body.landscape-mode #flower-shelf-area {
+  padding-right: max(14px, calc(env(safe-area-inset-right) * var(--inv-scale, 1)));
+}
+
+/* Tăng độ rõ nét và kích thước chạm trên điện thoại xoay ngang */
+body.mobile-landscape .hud-btn {
+  padding: 5px 9px;
+  font-size: 11.5px;
+}
+body.mobile-landscape .bucket-name-plate {
+  font-size: 11px;
+}
+body.mobile-landscape .bucket-stock-badge-large {
+  font-size: 11.5px;
+  padding: 2px 7px;
+}
+body.mobile-landscape .ticket-cust-name {
+  font-size: 12.5px;
+}
+body.mobile-landscape .ticket-flw-details span,
+body.mobile-landscape .ticket-flw-details strong {
+  font-size: 11px;
+}
+body.mobile-landscape .ticket-mat-desc strong {
+  font-size: 10.5px;
+}
+body.mobile-landscape .score-checklist.seven-rows {
+  font-size: 10.5px;
+}
+body.mobile-landscape .decor-card-name {
+  font-size: 10.5px;
+}
+body.mobile-landscape .btn-deliver-order {
+  font-size: 15px;
+}
+body.mobile-landscape .modal-dialog,
+body.mobile-landscape .modal-dialog.upgrade-dialog,
+body.mobile-landscape .diy-dialog {
+  max-height: 92%;
+}

@@ -597,11 +597,16 @@ class FlowerShopGame {
       const vw = (vv ? vv.width : window.innerWidth) || 1400;
       const vh = (vv ? vv.height : window.innerHeight) || 788;
 
-      // Bật chế độ Responsive Mobile Portrait (1:1 không thu nhỏ) khi màn hình dọc hoặc rất hẹp
-      const isPortrait = vw < 760 || (vh > vw && vw < 900);
+      // Chỉ bật chế độ dọc khi chiều cao > chiều rộng trên thiết bị di động hẹp;
+      // mọi thiết bị xoay ngang (vw >= vh) luôn dùng bố cục ngang chuẩn full màn hình!
+      const isPortrait = vh > vw && vw < 900;
+      const isMobileLandscape = !isPortrait && (vh < 560 || vw < 1050);
       this.isMobilePortrait = isPortrait;
+
       if (document.body && document.body.classList) {
         document.body.classList.toggle('mobile-portrait', isPortrait);
+        document.body.classList.toggle('landscape-mode', !isPortrait);
+        document.body.classList.toggle('mobile-landscape', isMobileLandscape);
       }
 
       if (isPortrait) {
@@ -609,6 +614,7 @@ class FlowerShopGame {
         container.style.height = '100%';
         container.style.transform = 'none';
         container.style.transformOrigin = 'top left';
+        if (container.style.setProperty) container.style.setProperty('--inv-scale', '1');
         this.setMobilePrepTab(this.activeMobilePrepTab || 'plan');
         this.setMobilePlayTab(this.activeMobilePlayTab || 'customers');
       } else {
@@ -616,19 +622,31 @@ class FlowerShopGame {
         const screenAspect = vw / vh;
         let scale;
         let dynamicW;
+        let dynamicH;
+
         if (screenAspect >= targetAspect) {
-          // Màn hình ngang rộng (điện thoại xoay ngang 19:9, 20:9...): vừa khít 100% chiều cao & rộng
+          // Màn hình ngang rộng (16:9, 19:9, 20:9, 21:9...): vừa khít 100% chiều cao & mở rộng chiều rộng
           scale = vh / baseH;
-          dynamicW = Math.round(vw / scale);
+          dynamicW = Math.max(baseW, Math.round(vw / scale));
+          dynamicH = baseH;
         } else {
-          // Màn hình 4:3 (iPad / cửa sổ hẹp): giữ 1400px chuẩn và thu vừa trọn chiều ngang
+          // Màn hình ngang tỷ lệ 4:3 hoặc 16:10 (iPad, tablet, laptop...): giữ rộng 1400px & co giãn chiều cao vừa khít
+          scale = vw / baseW;
           dynamicW = baseW;
-          scale = Math.min(vw / baseW, vh / baseH);
+          dynamicH = Math.max(baseH, Math.round(vh / scale));
         }
+
         container.style.width = `${dynamicW}px`;
-        container.style.height = `${baseH}px`;
+        container.style.height = `${dynamicH}px`;
         container.style.transform = `translate(-50%, -50%) scale(${scale})`;
         container.style.transformOrigin = 'center center';
+        if (container.style.setProperty) {
+          container.style.setProperty('--inv-scale', (1 / Math.max(0.2, scale)).toFixed(4));
+        }
+      }
+
+      if (typeof window.scrollTo === 'function') {
+        try { window.scrollTo(0, 0); } catch (_) {}
       }
 
       const rotNotice = document.getElementById('phone-rotate-notice');
@@ -639,15 +657,16 @@ class FlowerShopGame {
     window.addEventListener('resize', resizeHandler);
     if (window.visualViewport && window.visualViewport.addEventListener) {
       window.visualViewport.addEventListener('resize', resizeHandler);
+      window.visualViewport.addEventListener('scroll', resizeHandler);
     }
     window.addEventListener('orientationchange', () => {
-      setTimeout(resizeHandler, 200);
-      setTimeout(resizeHandler, 500);
+      setTimeout(resizeHandler, 180);
+      setTimeout(resizeHandler, 480);
     });
     if (typeof screen !== 'undefined' && screen.orientation) {
       screen.orientation.addEventListener('change', () => {
-        setTimeout(resizeHandler, 200);
-        setTimeout(resizeHandler, 500);
+        setTimeout(resizeHandler, 180);
+        setTimeout(resizeHandler, 480);
       });
     }
     resizeHandler();
@@ -656,19 +675,29 @@ class FlowerShopGame {
   toggleFullscreen() {
     const doc = document.documentElement;
     const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    const tryLockLandscape = () => {
+      try {
+        if (typeof screen !== 'undefined' && screen.orientation && screen.orientation.lock) {
+          screen.orientation.lock('landscape').catch(() => {});
+        }
+      } catch (_) {}
+    };
+
     if (!isFull) {
       if (doc.requestFullscreen) {
         doc.requestFullscreen().then(() => {
-          this.showToast('⛶ Đã bật chế độ Toàn Màn Hình!');
+          tryLockLandscape();
+          this.showToast('⛶ Đã bật chế độ Toàn Màn Hình ngang!');
         }).catch(() => {
           this.showToast('📱 Hãy xoay ngang điện thoại hoặc nhấn Chia sẻ → Thêm vào MH chính để chơi Full màn hình!');
         });
       } else if (doc.webkitRequestFullscreen) {
         doc.webkitRequestFullscreen();
-        this.showToast('⛶ Đã bật chế độ Toàn Màn Hình!');
+        tryLockLandscape();
+        this.showToast('⛶ Đã bật chế độ Toàn Màn Hình ngang!');
       } else if (doc.msRequestFullscreen) {
         doc.msRequestFullscreen();
-        this.showToast('⛶ Đã bật chế độ Toàn Màn Hình!');
+        this.showToast('⛶ Đã bật chế độ Toàn Màn Hình ngang!');
       } else {
         this.showToast('📱 Trên iPhone: Bấm nút "AA" ẩn thanh công cụ hoặc Chia sẻ → "Thêm vào MH chính" để Full 100%!');
       }
