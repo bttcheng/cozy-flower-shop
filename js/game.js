@@ -448,16 +448,20 @@ class FlowerShopGame {
     const resizeHandler = () => {
       const container = document.getElementById('game-container');
       if (!container) return;
-      const targetW = 1400;
-      const targetH = 788;
+      const baseH = 788;
       const vw = window.innerWidth;
       const vh = window.innerHeight;
 
-      const scaleX = vw / targetW;
-      const scaleY = vh / targetH;
-      // Tự động scale vừa khít khung màn hình điện thoại (cả ngang lẫn dọc)
-      const scale = Math.min(scaleX, scaleY);
+      // Tính tỷ lệ scale theo chiều cao để giao diện luôn khớp khít 100% chiều dọc màn hình
+      const scale = vh / baseH;
+      // Chiều rộng container co giãn linh hoạt theo tỷ lệ màn hình (tối thiểu 1400px)
+      // Giúp loại bỏ hoàn toàn 2 vệt đen 2 bên trên màn hình điện thoại ngang (19:9, 20:9)
+      const dynamicW = Math.max(1400, Math.round(vw / scale));
+      
+      container.style.width = `${dynamicW}px`;
+      container.style.height = `${baseH}px`;
       container.style.transform = `scale(${scale})`;
+      container.style.transformOrigin = 'center center';
 
       // Cảnh báo xoay màn hình ngang khi ở chế độ dọc (portrait) trên điện thoại
       const isPortrait = vh > vw && vw < 860;
@@ -493,7 +497,35 @@ class FlowerShopGame {
     resizeHandler();
   }
 
+  toggleFullscreen() {
+    const doc = document.documentElement;
+    const isFull = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+    if (!isFull) {
+      if (doc.requestFullscreen) {
+        doc.requestFullscreen().catch(() => {});
+      } else if (doc.webkitRequestFullscreen) {
+        doc.webkitRequestFullscreen();
+      } else if (doc.msRequestFullscreen) {
+        doc.msRequestFullscreen();
+      }
+      this.showToast('⛶ Đã bật chế độ Toàn Màn Hình!');
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+      this.showToast('Đã thu nhỏ màn hình.');
+    }
+  }
+
   bindEvents() {
+    // Toàn Màn Hình
+    const fsBtn = document.getElementById('btn-fullscreen-toggle');
+    if (fsBtn) {
+      fsBtn.addEventListener('click', () => this.toggleFullscreen());
+    }
+
     // Âm thanh & Nhạc
     document.getElementById('btn-sound-toggle').addEventListener('click', (e) => {
       const enabled = window.soundMgr.toggleSound();
@@ -690,7 +722,8 @@ class FlowerShopGame {
     const positionGhost = (ghost, clientX, clientY) => {
       const container = document.getElementById('game-container');
       const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0, width: 1400 };
-      const scale = rect.width ? rect.width / 1400 : 1;
+      const currentContainerWidth = container ? (parseFloat(container.style.width) || 1400) : 1400;
+      const scale = rect.width ? rect.width / currentContainerWidth : 1;
       const gx = (clientX - rect.left) / scale;
       const gy = (clientY - rect.top) / scale;
       ghost.style.left = `${gx}px`;
