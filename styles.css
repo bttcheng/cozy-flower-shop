@@ -368,7 +368,7 @@ body {
   flex: 1;
   display: grid;
   grid-template-columns: 450px 1fr;
-  height: calc(100% - 54px - 26px - 258px);
+  height: calc(100% - 54px - 26px - 266px);
 }
 
 /* A. KHU VỰC QUẦY ĐÓN KHÁCH & BẢNG KẸP ĐƠN HÀNG CỐ ĐỊNH */
@@ -1096,7 +1096,7 @@ body {
 #workbench-area {
   position: relative;
   z-index: 20;
-  height: 258px;
+  height: 266px;
   background: #ede0d4;
   border-top: 4px solid var(--wood-dark);
   box-shadow: 0 -10px 30px rgba(62, 31, 12, 0.2);
@@ -1429,48 +1429,65 @@ body {
 }
 
 /* BẢNG CHẤM ĐIỂM TIÊU CHÍ & GIAO THU TIỀN */
-.action-deliver-container { display: flex; flex-direction: column; gap: 8px; }
+.action-deliver-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6px;
+  height: 100%;
+  min-height: 0;
+}
 .scoring-card {
+  flex: 1;
+  min-height: 0;
   background: #ffffff;
   border: var(--border-thick);
   border-radius: 12px;
-  padding: 8px 10px;
+  padding: 5px 8px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  justify-content: space-between;
+  gap: 2px;
   box-shadow: var(--shadow-cozy);
+  overflow: hidden;
 }
 .score-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1.5px dashed #d8a473;
-  padding-bottom: 3px;
+  padding-bottom: 2px;
+  flex-shrink: 0;
 }
-.score-title { font-size: 11.5px; font-weight: 900; color: var(--wood-dark); }
-.score-percent { font-size: 15px; font-weight: 900; color: #166534; }
+.score-title { font-size: 11px; font-weight: 900; color: var(--wood-dark); }
+.score-percent { font-size: 14px; font-weight: 900; color: #166534; }
 
 .score-checklist {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  font-size: 10.5px;
+  gap: 1px;
+  font-size: 9.5px;
   font-weight: 700;
   color: #475569;
+  line-height: 1.25;
 }
-.score-row { display: flex; align-items: center; justify-content: space-between; }
+.score-row { display: flex; align-items: center; justify-content: space-between; white-space: nowrap; }
 .score-row.passed { color: #166534; font-weight: 800; }
 .score-row.passed .dot { color: #166534; }
 .score-row.failed { color: #e11d48; }
 
 .score-feedback {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 800;
   color: #be123c;
   background: #fff1f2;
-  padding: 3px 6px;
+  padding: 2px 6px;
   border-radius: 6px;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 
 .price-row {
@@ -1478,13 +1495,15 @@ body {
   justify-content: space-between;
   align-items: center;
   border-top: 1.5px dashed #d8a473;
-  padding-top: 4px;
+  padding-top: 2px;
+  flex-shrink: 0;
 }
-.price-label { font-size: 11px; font-weight: 800; color: #64748b; }
-.price-val { font-size: 16px; font-weight: 900; color: #b45309; }
+.price-label { font-size: 10.5px; font-weight: 800; color: #64748b; }
+.price-val { font-size: 14.5px; font-weight: 900; color: #b45309; }
 
 .btn-deliver-order {
-  flex: 1;
+  flex: 0 0 46px;
+  min-height: 46px;
   background: #e11d48;
   border: var(--border-thick);
   border-radius: 12px;
@@ -1497,9 +1516,10 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 5px 0 #881337;
+  box-shadow: 0 4px 0 #881337;
   letter-spacing: 0.5px;
   transition: all 0.15s;
+  white-space: nowrap;
 }
 .btn-deliver-order:hover { background: #be123c; transform: translateY(-2px); box-shadow: 0 7px 0 #881337; }
 .btn-deliver-order:active { transform: translateY(2px); box-shadow: 0 2px 0 #881337; }
@@ -2868,12 +2888,16 @@ button, .big-flower-bucket, .decor-visual-card, .chibi-customer-stand, .tool-btn
 
 /* PHỐI MÀU HÀI HÒA TRONG BẢNG CHẤM ĐIỂM */
 .color-harmony-pill {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 900;
-  padding: 2px 7px;
+  padding: 1px 6px;
   border-radius: 6px;
   text-align: center;
   border: 1.5px solid #cbd5e1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
 }
 .color-harmony-pill.harmony-good {
   background: #dcfce7;
@@ -3846,13 +3870,15 @@ body.mobile-landscape .ticket-mat-desc strong {
   font-size: 10.5px;
 }
 body.mobile-landscape .score-checklist.seven-rows {
-  font-size: 10.5px;
+  font-size: 9.8px;
 }
 body.mobile-landscape .decor-card-name {
   font-size: 10.5px;
 }
 body.mobile-landscape .btn-deliver-order {
-  font-size: 15px;
+  flex: 0 0 46px;
+  min-height: 46px;
+  font-size: 14.5px;
 }
 body.mobile-landscape .modal-dialog,
 body.mobile-landscape .modal-dialog.upgrade-dialog,
