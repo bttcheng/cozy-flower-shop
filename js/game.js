@@ -654,12 +654,22 @@ class FlowerShopGame {
     document.getElementById('btn-tutorial-open').addEventListener('click', () => this.openModal('modal-tutorial'));
     document.getElementById('btn-pause-game').addEventListener('click', () => this.togglePauseGame());
 
-    // Mini-game Thắt Nơ
+    // Mini-game Thắt Nơ (dùng pointerdown để phản hồi tức thì khi chạm/bấm)
     const rmTieBtn = document.getElementById('btn-rm-tie');
     const rmTrack = document.getElementById('rm-track-wrap');
     const rmSkipBtn = document.getElementById('btn-rm-skip');
-    if (rmTieBtn) rmTieBtn.addEventListener('click', () => this.stopRibbonMinigame(false));
-    if (rmTrack) rmTrack.addEventListener('click', () => this.stopRibbonMinigame(false));
+    const triggerTie = (e) => {
+      if (e && e.cancelable) e.preventDefault();
+      this.stopRibbonMinigame(false);
+    };
+    if (rmTieBtn) {
+      rmTieBtn.addEventListener('pointerdown', triggerTie);
+      rmTieBtn.addEventListener('click', () => this.stopRibbonMinigame(false));
+    }
+    if (rmTrack) {
+      rmTrack.addEventListener('pointerdown', triggerTie);
+      rmTrack.addEventListener('click', () => this.stopRibbonMinigame(false));
+    }
     if (rmSkipBtn) rmSkipBtn.addEventListener('click', () => this.stopRibbonMinigame(true));
 
     // Góc Sáng Tạo DIY
@@ -2723,7 +2733,7 @@ class FlowerShopGame {
       if (!this.ribbonMinigame.active || this.ribbonMinigame.locked) return;
       const dt = Math.min(0.05, (now - this.ribbonMinigame.lastTime) / 1000);
       this.ribbonMinigame.lastTime = now;
-      const speed = 135; // % mỗi giây
+      const speed = 58; // Tốc độ mượt mà vừa tầm tay để người chơi dễ căn chuẩn Hoàn Mỹ
       this.ribbonMinigame.pos += this.ribbonMinigame.dir * speed * dt;
       if (this.ribbonMinigame.pos >= 94) {
         this.ribbonMinigame.pos = 94;
@@ -2760,7 +2770,7 @@ class FlowerShopGame {
 
     const pos = this.ribbonMinigame.pos;
     let bowResult;
-    if (pos >= 41 && pos <= 59) {
+    if (pos >= 36 && pos <= 64) {
       bowResult = {
         tier: 'perfect',
         bonusMult: 0.25,
@@ -2768,7 +2778,7 @@ class FlowerShopGame {
         label: '✨ BÓ HOA HOÀN MỸ! (+25% giá & +8 🪙 boa)'
       };
       window.soundMgr.playPerfectBow();
-    } else if (pos >= 28 && pos <= 72) {
+    } else if (pos >= 20 && pos <= 80) {
       bowResult = {
         tier: 'good',
         bonusMult: 0.10,
