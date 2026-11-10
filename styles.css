@@ -3470,3 +3470,326 @@ button, .big-flower-bucket, .decor-visual-card, .chibi-customer-stand, .tool-btn
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-2px); }
 }
+
+/* ==========================================================================
+   5. CHẾ ĐỘ RESPONSIVE DI ĐỘNG TOÀN DIỆN (MOBILE PORTRAIT & TABLET)
+   ========================================================================== */
+.mobile-subtabs,
+.mobile-sticky-cta,
+.mobile-order-strip,
+.mobile-shelf-drop-target {
+  display: none;
+}
+
+body.mobile-portrait #game-container {
+  position: relative;
+  left: 0;
+  top: 0;
+  transform: none !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+body.mobile-portrait #top-hud {
+  height: auto;
+  flex-wrap: wrap;
+  padding: 6px 8px;
+  gap: 5px;
+}
+body.mobile-portrait .hud-left {
+  width: 100%;
+  justify-content: space-between;
+  gap: 6px;
+}
+body.mobile-portrait .hud-center {
+  width: 100%;
+  justify-content: space-between;
+  gap: 6px;
+}
+body.mobile-portrait .hud-right {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  gap: 5px;
+  padding-bottom: 2px;
+}
+body.mobile-portrait .hud-btn {
+  padding: 5px 9px;
+  font-size: 11px;
+  min-height: 30px;
+}
+body.mobile-portrait #event-ticker {
+  height: 22px;
+  padding: 0 8px;
+  font-size: 10.5px;
+}
+
+/* Thanh tab chuyển đổi trên màn hình dọc / hẹp */
+body.mobile-portrait .mobile-subtabs {
+  display: flex;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #f5ebe0;
+  border-bottom: 2px solid #d8a473;
+  flex-shrink: 0;
+}
+body.mobile-portrait .mobile-tab-btn {
+  flex: 1;
+  background: #ffffff;
+  border: 2px solid #b08968;
+  border-radius: 10px;
+  padding: 7px 6px;
+  font-family: var(--font-main);
+  font-size: 11.5px;
+  font-weight: 900;
+  color: #3e1f0c;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+body.mobile-portrait .mobile-tab-btn.active {
+  background: linear-gradient(135deg, #ffe4e6, #fecdd3);
+  border-color: #e11d48;
+  color: #9f1239;
+  box-shadow: 0 2px 0 #be123c;
+}
+body.mobile-portrait .m-badge {
+  background: #1e3a5f;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+/* Dải tóm tắt đơn hàng luôn hiển thị khi chuyển sang tab Kệ / Cắm hoa */
+body.mobile-portrait .mobile-order-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 10px;
+  background: #fffbeb;
+  border-bottom: 2px solid #fcd34d;
+  font-size: 11px;
+  font-weight: 800;
+  color: #1e3a5f;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+body.mobile-portrait .m-strip-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+body.mobile-portrait .m-strip-score {
+  background: #dcfce7;
+  color: #166534;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+/* Giai đoạn 1 Buổi Sáng trên Mobile Portrait */
+body.mobile-portrait #morning-prep-screen {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+body.mobile-portrait .morning-prep-grid {
+  display: block;
+  flex: 1;
+  min-height: 0;
+  padding: 8px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+body.mobile-portrait .prep-col {
+  display: none;
+  height: auto;
+  min-height: 100%;
+}
+body.mobile-portrait .prep-col.mobile-panel-active {
+  display: flex;
+}
+body.mobile-portrait .prep-col-plan .prep-cta-footer {
+  display: none;
+}
+body.mobile-portrait .mobile-sticky-cta {
+  display: flex;
+  padding: 8px 10px;
+  background: #fff8f0;
+  border-top: 2px solid #d8a473;
+  flex-shrink: 0;
+}
+body.mobile-portrait .mobile-sticky-cta .btn-open-shop-hero {
+  width: 100%;
+  justify-content: center;
+  padding: 10px 14px;
+  font-size: 13.5px;
+}
+body.mobile-portrait .prep-shelf-restock-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+body.mobile-portrait .prep-material-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* Giai đoạn 2 Mở Bán trên Mobile Portrait: Tách 3 tab Khách / Kệ / Cắm & Giao */
+body.mobile-portrait #game-container[data-mobile-view="customers"] #main-playfield {
+  display: flex !important;
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  flex-direction: column;
+}
+body.mobile-portrait #game-container[data-mobile-view="customers"] #customer-area {
+  display: flex;
+  flex: 1;
+  border-right: none;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+body.mobile-portrait #game-container[data-mobile-view="customers"] #flower-shelf-area,
+body.mobile-portrait #game-container[data-mobile-view="customers"] #workbench-area {
+  display: none !important;
+}
+
+body.mobile-portrait #game-container[data-mobile-view="shelf"] #main-playfield {
+  display: flex !important;
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  flex-direction: column;
+}
+body.mobile-portrait #game-container[data-mobile-view="shelf"] #customer-area,
+body.mobile-portrait #game-container[data-mobile-view="shelf"] #workbench-area {
+  display: none !important;
+}
+body.mobile-portrait #game-container[data-mobile-view="shelf"] #flower-shelf-area {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  padding: 8px;
+}
+body.mobile-portrait .wooden-shelf-rack {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+body.mobile-portrait .flower-buckets-container {
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  padding: 4px;
+}
+body.mobile-portrait .big-flower-bucket {
+  width: 86px;
+  height: 112px;
+}
+body.mobile-portrait .mobile-shelf-drop-target {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 6px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+  border: 2.5px dashed #10b981;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 900;
+  color: #065f46;
+  flex-shrink: 0;
+}
+body.mobile-portrait .mobile-shelf-drop-target.drag-over {
+  background: #a7f3d0;
+  transform: scale(1.02);
+}
+
+body.mobile-portrait #game-container[data-mobile-view="workbench"] #main-playfield {
+  display: none !important;
+}
+body.mobile-portrait #game-container[data-mobile-view="workbench"] #workbench-area {
+  display: flex !important;
+  flex-direction: column;
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  padding: 8px;
+  gap: 8px;
+}
+body.mobile-portrait .workbench-tools-tray {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+}
+body.mobile-portrait .workbench-tools-tray .tray-title {
+  display: none;
+}
+body.mobile-portrait .workbench-tools-tray .tool-btn {
+  flex: 1;
+  flex-direction: row;
+  justify-content: center;
+  padding: 8px 6px;
+  font-size: 12px;
+}
+body.mobile-portrait .workbench-workspace-center {
+  min-height: 235px;
+}
+body.mobile-portrait #bouquet-workspace {
+  min-height: 190px;
+}
+body.mobile-portrait .decor-selection-container {
+  min-height: 165px;
+}
+body.mobile-portrait .decor-items-grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+body.mobile-portrait .btn-deliver-order {
+  min-height: 46px;
+  font-size: 15px;
+}
+
+/* Modal Responsive trên Mobile Portrait */
+body.mobile-portrait .modal-dialog,
+body.mobile-portrait .modal-dialog.upgrade-dialog,
+body.mobile-portrait .diy-dialog {
+  width: 95%;
+  max-width: 95%;
+  max-height: 88%;
+}
+body.mobile-portrait .diy-body-grid {
+  grid-template-columns: 1fr;
+  max-height: 70vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+body.mobile-portrait .upgrade-atmosphere-grid {
+  grid-template-columns: 1fr;
+}
+body.mobile-portrait .upgrade-flowers-grid,
+body.mobile-portrait .restock-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+body.mobile-portrait .day-stats {
+  grid-template-columns: repeat(2, 1fr);
+}

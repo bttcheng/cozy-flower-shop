@@ -58,6 +58,9 @@ class FlowerShopGame {
     this.dragState = null;
     this.suppressNextBucketClick = false;
     this.justSnappedStemIdx = -1;
+    this.isMobilePortrait = false;
+    this.activeMobilePrepTab = 'plan';
+    this.activeMobilePlayTab = 'customers';
 
     // Trạng thái Mini-game thắt nơ
     this.ribbonMinigame = {
@@ -485,11 +488,49 @@ class FlowerShopGame {
       if (prepScreen) prepScreen.style.display = 'flex';
       if (playfield) playfield.style.display = 'none';
       if (workbench) workbench.style.display = 'none';
+      this.setMobilePrepTab(this.activeMobilePrepTab || 'plan');
     } else {
       if (prepScreen) prepScreen.style.display = 'none';
       if (playfield) playfield.style.display = 'grid';
       if (workbench) workbench.style.display = 'grid';
+      this.setMobilePlayTab(this.activeMobilePlayTab || 'customers');
     }
+    this.syncMobilePlayTabsVisibility();
+  }
+
+  setMobilePrepTab(tabName) {
+    this.activeMobilePrepTab = tabName || 'plan';
+    document.querySelectorAll('#mobile-prep-tabs .mobile-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.prepTab === this.activeMobilePrepTab);
+    });
+    const prepMap = {
+      plan: '.prep-col-plan',
+      stock: '.prep-col-stock',
+      decor: '.prep-col-decor'
+    };
+    Object.entries(prepMap).forEach(([key, sel]) => {
+      const col = document.querySelector(sel);
+      if (col) col.classList.toggle('mobile-panel-active', key === this.activeMobilePrepTab);
+    });
+  }
+
+  setMobilePlayTab(tabName) {
+    this.activeMobilePlayTab = tabName || 'customers';
+    document.querySelectorAll('#mobile-play-tabs .mobile-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.playTab === this.activeMobilePlayTab);
+    });
+    const container = document.getElementById('game-container');
+    if (container) {
+      container.dataset.mobileView = this.activeMobilePlayTab;
+    }
+  }
+
+  syncMobilePlayTabsVisibility() {
+    const playTabs = document.getElementById('mobile-play-tabs');
+    const orderStrip = document.getElementById('mobile-order-strip');
+    const show = !!(this.isMobilePortrait && this.state.phase !== 'PREPARING');
+    if (playTabs) playTabs.style.display = show ? 'flex' : 'none';
+    if (orderStrip) orderStrip.style.display = show ? 'flex' : 'none';
   }
 
   // ĐỒNG BỘ MỞ KHÓA TỰ ĐỘNG THEO NGÀY (NGÀY 1, 2, 3)
@@ -547,7 +588,6 @@ class FlowerShopGame {
   }
 
   setupWindowScaling() {
-    this.dismissedRotateNotice = false;
     const resizeHandler = () => {
       const container = document.getElementById('game-container');
       if (!container) return;
@@ -556,54 +596,44 @@ class FlowerShopGame {
       const vv = window.visualViewport;
       const vw = (vv ? vv.width : window.innerWidth) || 1400;
       const vh = (vv ? vv.height : window.innerHeight) || 788;
-      const targetAspect = baseW / baseH;
-      const screenAspect = vw / vh;
 
-      let scale;
-      let dynamicW;
-      if (screenAspect >= targetAspect) {
-        // Màn hình ngang rộng (điện thoại 19:9, 20:9...): vừa khít 100% chiều cao & 100% chiều rộng, không cắt viền
-        scale = vh / baseH;
-        dynamicW = Math.round(vw / scale);
+      // Bật chế độ Responsive Mobile Portrait (1:1 không thu nhỏ) khi màn hình dọc hoặc rất hẹp
+      const isPortrait = vw < 760 || (vh > vw && vw < 900);
+      this.isMobilePortrait = isPortrait;
+      if (document.body && document.body.classList) {
+        document.body.classList.toggle('mobile-portrait', isPortrait);
+      }
+
+      if (isPortrait) {
+        container.style.width = '100%';
+        container.style.height = '100%';
+        container.style.transform = 'none';
+        container.style.transformOrigin = 'top left';
+        this.setMobilePrepTab(this.activeMobilePrepTab || 'plan');
+        this.setMobilePlayTab(this.activeMobilePlayTab || 'customers');
       } else {
-        // Màn hình hẹp hơn 16:9 (iPad 4:3 hoặc màn hình dọc): giữ khung 1400px chuẩn và thu vừa trọn chiều ngang không che mất nội dung
-        dynamicW = baseW;
-        scale = Math.min(vw / baseW, vh / baseH);
-      }
-
-      container.style.width = `${dynamicW}px`;
-      container.style.height = `${baseH}px`;
-      container.style.transform = `translate(-50%, -50%) scale(${scale})`;
-      container.style.transformOrigin = 'center center';
-
-      // Cảnh báo xoay màn hình ngang khi ở chế độ dọc (portrait) trên điện thoại
-      const isPortrait = vh > vw && vw < 860;
-      let rotNotice = document.getElementById('phone-rotate-notice');
-      if (isPortrait && !this.dismissedRotateNotice) {
-        if (!rotNotice) {
-          rotNotice = document.createElement('div');
-          rotNotice.id = 'phone-rotate-notice';
-          rotNotice.innerHTML = `
-            <div class="rotate-card">
-              <span class="rotate-icon">🔄📱</span>
-              <strong>Xoay ngang màn hình</strong>
-              <small>Hãy xoay ngang điện thoại để có trải nghiệm cắm hoa to rõ và vừa khít toàn màn hình nhất nhé!</small>
-              <button class="rotate-dismiss-btn" id="btn-dismiss-rotate">Vẫn chơi màn hình dọc</button>
-            </div>
-          `;
-          document.body.appendChild(rotNotice);
-          const dismissBtn = document.getElementById('btn-dismiss-rotate');
-          if (dismissBtn) {
-            dismissBtn.addEventListener('click', () => {
-              this.dismissedRotateNotice = true;
-              rotNotice.style.display = 'none';
-            });
-          }
+        const targetAspect = baseW / baseH;
+        const screenAspect = vw / vh;
+        let scale;
+        let dynamicW;
+        if (screenAspect >= targetAspect) {
+          // Màn hình ngang rộng (điện thoại xoay ngang 19:9, 20:9...): vừa khít 100% chiều cao & rộng
+          scale = vh / baseH;
+          dynamicW = Math.round(vw / scale);
+        } else {
+          // Màn hình 4:3 (iPad / cửa sổ hẹp): giữ 1400px chuẩn và thu vừa trọn chiều ngang
+          dynamicW = baseW;
+          scale = Math.min(vw / baseW, vh / baseH);
         }
-        rotNotice.style.display = 'flex';
-      } else if (rotNotice) {
-        rotNotice.style.display = 'none';
+        container.style.width = `${dynamicW}px`;
+        container.style.height = `${baseH}px`;
+        container.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        container.style.transformOrigin = 'center center';
       }
+
+      const rotNotice = document.getElementById('phone-rotate-notice');
+      if (rotNotice) rotNotice.style.display = 'none';
+      this.syncMobilePlayTabsVisibility();
     };
 
     window.addEventListener('resize', resizeHandler);
@@ -611,13 +641,11 @@ class FlowerShopGame {
       window.visualViewport.addEventListener('resize', resizeHandler);
     }
     window.addEventListener('orientationchange', () => {
-      this.dismissedRotateNotice = false;
       setTimeout(resizeHandler, 200);
       setTimeout(resizeHandler, 500);
     });
     if (typeof screen !== 'undefined' && screen.orientation) {
       screen.orientation.addEventListener('change', () => {
-        this.dismissedRotateNotice = false;
         setTimeout(resizeHandler, 200);
         setTimeout(resizeHandler, 500);
       });
@@ -898,35 +926,79 @@ class FlowerShopGame {
     document.getElementById('btn-action-deliver').addEventListener('click', () => {
       this.deliverOrder();
     });
+
+    // Tab chuyển đổi Mobile Portrait (Sáng: Kế hoạch / Kho hoa / Giấy gói | Mở bán: Khách / Kệ / Bàn cắm)
+    document.querySelectorAll('#mobile-prep-tabs .mobile-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        this.setMobilePrepTab(e.currentTarget.dataset.prepTab);
+      });
+    });
+
+    document.querySelectorAll('#mobile-play-tabs .mobile-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        this.setMobilePlayTab(e.currentTarget.dataset.playTab);
+      });
+    });
+
+    const mobileOpenBtn = document.getElementById('btn-mobile-open-store');
+    if (mobileOpenBtn) {
+      mobileOpenBtn.addEventListener('click', () => this.openStoreForBusiness());
+    }
+
+    const mobileOrderStrip = document.getElementById('mobile-order-strip');
+    if (mobileOrderStrip) {
+      mobileOrderStrip.addEventListener('click', () => {
+        this.setMobilePlayTab('customers');
+      });
+    }
+  }
+
+  getEventClientXY(e) {
+    if (e.touches && e.touches.length > 0) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    if (e.changedTouches && e.changedTouches.length > 0) {
+      return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+    }
+    return { x: e.clientX || 0, y: e.clientY || 0 };
   }
 
   setupSmoothPointerDrag() {
     const positionGhost = (ghost, clientX, clientY) => {
       const container = document.getElementById('game-container');
       const rect = container ? container.getBoundingClientRect() : { left: 0, top: 0, width: 1400 };
-      const currentContainerWidth = container ? (parseFloat(container.style.width) || 1400) : 1400;
-      const scale = rect.width ? rect.width / currentContainerWidth : 1;
+      let scale = 1;
+      if (!this.isMobilePortrait) {
+        const currentContainerWidth = container ? (parseFloat(container.style.width) || 1400) : 1400;
+        scale = rect.width ? rect.width / currentContainerWidth : 1;
+      }
       const gx = (clientX - rect.left) / scale;
       const gy = (clientY - rect.top) / scale;
       ghost.style.left = `${gx}px`;
       ghost.style.top = `${gy}px`;
     };
 
-    const isOverWorkspace = (clientX, clientY) => {
-      const ws = document.getElementById('bouquet-workspace');
-      if (!ws) return false;
-      const r = ws.getBoundingClientRect();
-      const pad = 18;
-      return clientX >= r.left - pad && clientX <= r.right + pad && clientY >= r.top - pad && clientY <= r.bottom + pad;
+    const isOverDropZone = (clientX, clientY) => {
+      const checkEl = (el, pad = 18) => {
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) return false;
+        return clientX >= r.left - pad && clientX <= r.right + pad && clientY >= r.top - pad && clientY <= r.bottom + pad;
+      };
+      return checkEl(document.getElementById('bouquet-workspace'), 20) ||
+             checkEl(document.getElementById('mobile-shelf-drop-target'), 18);
     };
 
-    document.addEventListener('pointermove', (e) => {
+    const handleMove = (e, sourceType) => {
       if (!this.dragState) return;
+      if (this.dragState.source && this.dragState.source !== sourceType) return;
       const ds = this.dragState;
-      const dist = Math.hypot(e.clientX - ds.startX, e.clientY - ds.startY);
+      const { x, y } = this.getEventClientXY(e);
+      const dist = Math.hypot(x - ds.startX, y - ds.startY);
       const ghost = document.getElementById('drag-flower-ghost');
       const ws = document.getElementById('bouquet-workspace');
       const ring = document.getElementById('workspace-snap-ring');
+      const mDrop = document.getElementById('mobile-shelf-drop-target');
 
       if (!ds.active && dist > 8) {
         if ((this.state.flowerStocks[ds.flowerId] ?? 0) <= 0) {
@@ -941,23 +1013,30 @@ class FlowerShopGame {
         }
       }
 
-      if (ds.active && ghost) {
-        positionGhost(ghost, e.clientX, e.clientY);
-        const over = isOverWorkspace(e.clientX, e.clientY);
-        ghost.classList.toggle('snap-ready', over);
-        if (ws) ws.classList.toggle('drag-over', over);
-        if (ring) ring.classList.toggle('visible', over);
+      if (ds.active) {
+        if (e.cancelable) e.preventDefault();
+        if (ghost) {
+          positionGhost(ghost, x, y);
+          const over = isOverDropZone(x, y);
+          ghost.classList.toggle('snap-ready', over);
+          if (ws) ws.classList.toggle('drag-over', over);
+          if (ring) ring.classList.toggle('visible', over);
+          if (mDrop) mDrop.classList.toggle('drag-over', over);
+        }
       }
-    });
+    };
 
-    const endDrag = (e) => {
+    const endDrag = (e, sourceType) => {
       if (!this.dragState) return;
+      if (sourceType && this.dragState.source && this.dragState.source !== sourceType) return;
       const ds = this.dragState;
       this.dragState = null;
 
+      const { x, y } = this.getEventClientXY(e);
       const ghost = document.getElementById('drag-flower-ghost');
       const ws = document.getElementById('bouquet-workspace');
       const ring = document.getElementById('workspace-snap-ring');
+      const mDrop = document.getElementById('mobile-shelf-drop-target');
 
       if (ds.slotEl) ds.slotEl.classList.remove('is-dragging');
       if (ghost) {
@@ -966,16 +1045,17 @@ class FlowerShopGame {
       }
       if (ws) ws.classList.remove('drag-over');
       if (ring) ring.classList.remove('visible');
+      if (mDrop) mDrop.classList.remove('drag-over');
 
       if (ds.active) {
         this.suppressNextBucketClick = true;
-        setTimeout(() => { this.suppressNextBucketClick = false; }, 80);
+        setTimeout(() => { this.suppressNextBucketClick = false; }, 140);
 
-        if (isOverWorkspace(e.clientX, e.clientY)) {
+        if (isOverDropZone(x, y)) {
           this.pickFlowerToWorkbench(ds.flowerId, {
             type: 'drop',
-            clientX: e.clientX,
-            clientY: e.clientY
+            clientX: x,
+            clientY: y
           });
           if (ws) {
             ws.classList.remove('snap-pop');
@@ -987,8 +1067,16 @@ class FlowerShopGame {
       }
     };
 
-    document.addEventListener('pointerup', endDrag);
-    document.addEventListener('pointercancel', endDrag);
+    // Hỗ trợ đồng thời Touch (touchstart/touchmove/touchend), Mouse (mousedown/mousemove/mouseup) và Pointer Events
+    document.addEventListener('pointermove', (e) => handleMove(e, 'pointer'));
+    document.addEventListener('touchmove', (e) => handleMove(e, 'touch'), { passive: false });
+    document.addEventListener('mousemove', (e) => handleMove(e, 'mouse'));
+
+    document.addEventListener('pointerup', (e) => endDrag(e, 'pointer'));
+    document.addEventListener('pointercancel', (e) => endDrag(e, 'pointer'));
+    document.addEventListener('touchend', (e) => endDrag(e, 'touch'));
+    document.addEventListener('touchcancel', (e) => endDrag(e, 'touch'));
+    document.addEventListener('mouseup', (e) => endDrag(e, 'mouse'));
   }
 
   syncContainerStyleButtons() {
@@ -1425,17 +1513,24 @@ class FlowerShopGame {
           </div>
         `;
 
-        slot.addEventListener('pointerdown', (e) => {
+        const startBucketDrag = (e, sourceType) => {
           if (e.button !== undefined && e.button !== 0) return;
           if (this.state.phase !== 'OPEN' && this.state.phase !== 'CLOSING') return;
+          if (this.dragState) return;
+          const { x, y } = this.getEventClientXY(e);
           this.dragState = {
             flowerId: flower.id,
             slotEl: slot,
-            startX: e.clientX,
-            startY: e.clientY,
+            source: sourceType,
+            startX: x,
+            startY: y,
             active: false
           };
-        });
+        };
+
+        slot.addEventListener('pointerdown', (e) => startBucketDrag(e, 'pointer'));
+        slot.addEventListener('touchstart', (e) => startBucketDrag(e, 'touch'), { passive: true });
+        slot.addEventListener('mousedown', (e) => startBucketDrag(e, 'mouse'));
 
         slot.addEventListener('click', (e) => {
           if (this.suppressNextBucketClick) return;
@@ -1852,6 +1947,10 @@ class FlowerShopGame {
     cardLayer.innerHTML = '';
 
     const count = this.state.workbench.flowers.length;
+    const stemBadgeEl = document.getElementById('m-stem-badge');
+    const shelfStemEl = document.getElementById('m-shelf-stem-count');
+    if (stemBadgeEl) stemBadgeEl.textContent = count;
+    if (shelfStemEl) shelfStemEl.textContent = count;
     const containerType = this.state.workbench.containerType;
     const isBox = containerType === 'box';
     const isBasket = containerType === 'basket';
@@ -2430,6 +2529,9 @@ class FlowerShopGame {
       queueArea.appendChild(stand);
     });
 
+    const queueBadgeEl = document.getElementById('m-queue-badge');
+    if (queueBadgeEl) queueBadgeEl.textContent = this.state.customersQueue.length;
+
     this.updateActiveOrderClipboard();
   }
 
@@ -2477,6 +2579,10 @@ class FlowerShopGame {
     if (!cust) {
       if (standEl) standEl.classList.remove('express-order', 'choosy-order', 'diy-order');
       if (specialStrip) specialStrip.style.display = 'none';
+      const mStripTxt = document.getElementById('mobile-order-strip-text');
+      const mStripScore = document.getElementById('mobile-order-strip-score');
+      if (mStripTxt) mStripTxt.textContent = this.state.phase === 'CLOSING' ? '🌙 Đã phục vụ xong toàn bộ khách!' : '🌸 Đang chờ khách hàng ghé quầy...';
+      if (mStripScore) mStripScore.textContent = '0%';
       const isClosing = this.state.phase === 'CLOSING';
       orderView.style.display = 'none';
       if (waitingView) {
@@ -2609,6 +2715,19 @@ class FlowerShopGame {
       quoteEl.innerHTML = `💌 <em>"${cust.order.cardMsg}"</em>`;
     } else {
       quoteEl.style.display = 'none';
+    }
+
+    // Đồng bộ dải tóm tắt đơn hàng gọn cho chế độ điện thoại dọc
+    const mStripTxt = document.getElementById('mobile-order-strip-text');
+    if (mStripTxt) {
+      const flwSummary = Object.keys(cust.order.flowers)
+        .map(id => `${FLOWERS_DATA[id]?.name || id} x${cust.order.flowers[id]}`)
+        .join(', ');
+      const ipName = innerObj ? innerObj.name : '';
+      const pName = paperObj ? paperObj.name : '';
+      const rName = ribbonObj ? ribbonObj.name : '';
+      const cCard = cust.order.card ? ` • ${DECOR_DATA.cards.find(x => x.id === cust.order.card)?.name || ''}` : '';
+      mStripTxt.textContent = `${cMeta.icon} ${cMeta.shortName}: ${flwSummary} • ${ipName}/${pName}/${rName}${cCard}`;
     }
   }
 
@@ -2772,6 +2891,13 @@ class FlowerShopGame {
     const harmonyBonusMult = harmony.ready ? (1 + harmony.bonusMult) : 1;
     const estPrice = Math.round((cust.order.price * totalScore / 100) * expressMult * harmonyBonusMult);
     estPriceEl.textContent = isExpressActive ? `${estPrice} 🪙 (x2)` : `${estPrice} 🪙`;
+
+    const mStripScore = document.getElementById('mobile-order-strip-score');
+    if (mStripScore) {
+      mStripScore.textContent = `${totalScore}%`;
+      mStripScore.style.background = totalScore >= 85 ? '#dcfce7' : (totalScore >= 55 ? '#fef9c3' : '#fee2e2');
+      mStripScore.style.color = totalScore >= 85 ? '#166534' : (totalScore >= 55 ? '#854d0e' : '#991b1b');
+    }
 
     return { totalScore, estPrice, harmony };
   }

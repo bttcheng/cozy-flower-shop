@@ -87,6 +87,11 @@
 
       <!-- GIAI ĐOẠN 1: MÀN HÌNH SOẠN HÀNG BUỔI SÁNG (TÁCH BIỆT HOÀN TOÀN) -->
       <section id="morning-prep-screen">
+        <div class="mobile-subtabs" id="mobile-prep-tabs">
+          <button class="mobile-tab-btn active" data-prep-tab="plan">📋 Kế Hoạch</button>
+          <button class="mobile-tab-btn" data-prep-tab="stock">🌿 Kho Hoa</button>
+          <button class="mobile-tab-btn" data-prep-tab="decor">🎀 Giấy & Nơ</button>
+        </div>
         <div class="morning-prep-grid">
           
           <!-- CỘT 1: KẾ HOẠCH & XU HƯỚNG NGÀY MỚI -->
@@ -185,7 +190,23 @@
           </div>
 
         </div>
+        <div class="mobile-sticky-cta" id="mobile-prep-sticky-cta">
+          <button class="btn-open-shop-pulse btn-open-shop-hero" id="btn-mobile-open-store">
+            <span>🔔</span> LẬT BIỂN: MỞ BÁN NGAY!
+          </button>
+        </div>
       </section>
+
+      <!-- THANH CHUYỂN TAB DI ĐỘNG KHI MỞ BÁN & DẢI TÓM TẮT ĐƠN HÀNG -->
+      <div class="mobile-subtabs" id="mobile-play-tabs" style="display: none;">
+        <button class="mobile-tab-btn active" data-play-tab="customers">👥 Khách & Đơn <span class="m-badge" id="m-queue-badge">0</span></button>
+        <button class="mobile-tab-btn" data-play-tab="shelf">🌿 Kệ Hoa</button>
+        <button class="mobile-tab-btn" data-play-tab="workbench">💐 Cắm & Giao <span class="m-badge" id="m-stem-badge">0</span></button>
+      </div>
+      <div id="mobile-order-strip" class="mobile-order-strip" style="display: none;">
+        <span class="m-strip-text" id="mobile-order-strip-text">Chưa có đơn hàng</span>
+        <span class="m-strip-score" id="mobile-order-strip-score">0%</span>
+      </div>
 
       <!-- GIAI ĐOẠN 2: KHÔNG GIAN BÀY BÁN & PHỤC VỤ KHÁCH (PLAYFIELD) -->
       <main id="main-playfield" style="display: none;">
@@ -327,6 +348,10 @@
               <div class="flower-buckets-container" id="shelf-tier-1"></div>
               <div class="wood-board"></div>
             </div>
+          </div>
+
+          <div id="mobile-shelf-drop-target" class="mobile-shelf-drop-target">
+            <span>💐 Thả hoa vào đây hoặc chạm xô để cắm (<strong id="m-shelf-stem-count">0</strong> cành)</span>
           </div>
         </section>
 
