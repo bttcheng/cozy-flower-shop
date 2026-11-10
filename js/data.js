@@ -871,6 +871,148 @@ const CUSTOMERS_DATA = [
       <circle cx="92" cy="76" r="5" fill="#f43f5e" opacity="0.6"/>
       <path d="M64 83 Q70 88 76 83" stroke="#a21caf" stroke-width="2.5" fill="none" stroke-linecap="round"/>
     </svg>`
+  },
+  {
+    id: 'c_tho_mochi',
+    name: 'Thỏ Bông Mochi',
+    stylePref: 'Ngọt ngào',
+    thumbEmoji: '🐰',
+    dialogue: 'Hí hí~ Cho bạn Thỏ đặt hoa thật xinh xắn mềm mịn như kẹo bông nha!',
+    avatarSvg: `<svg viewBox="0 0 140 180" class="chibi-character">
+      <ellipse cx="52" cy="30" rx="11" ry="26" fill="#fff1f2" stroke="#3d200e" stroke-width="3" transform="rotate(-10 52 30)"/>
+      <ellipse cx="52" cy="32" rx="5.5" ry="18" fill="#fda4af" transform="rotate(-10 52 32)"/>
+      <ellipse cx="88" cy="30" rx="11" ry="26" fill="#fff1f2" stroke="#3d200e" stroke-width="3" transform="rotate(10 88 30)"/>
+      <ellipse cx="88" cy="32" rx="5.5" ry="18" fill="#fda4af" transform="rotate(10 88 32)"/>
+      <path d="M40 122 L100 122 L110 175 L30 175 Z" fill="#f9a8d4" stroke="#3d200e" stroke-width="3"/>
+      <ellipse cx="70" cy="124" rx="16" ry="7" fill="#ffffff" stroke="#3d200e" stroke-width="2"/>
+      <circle cx="70" cy="76" r="36" fill="#fff1f2" stroke="#3d200e" stroke-width="3.5"/>
+      <ellipse cx="56" cy="74" rx="4.5" ry="6" fill="#3d200e"/>
+      <circle cx="54.5" cy="72" r="2" fill="#ffffff"/>
+      <ellipse cx="84" cy="74" rx="4.5" ry="6" fill="#3d200e"/>
+      <circle cx="82.5" cy="72" r="2" fill="#ffffff"/>
+      <circle cx="47" cy="83" r="6.5" fill="#fb7185" opacity="0.55"/>
+      <circle cx="93" cy="83" r="6.5" fill="#fb7185" opacity="0.55"/>
+      <ellipse cx="70" cy="82" rx="3.5" ry="2.5" fill="#f43f5e"/>
+      <path d="M64 87 Q70 92 76 87" stroke="#3d200e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="88" cy="48" r="6" fill="#fde047" stroke="#3d200e" stroke-width="2"/>
+    </svg>`
+  },
+  {
+    id: 'c_hoa_si_may',
+    name: 'Họa Sĩ Mây',
+    stylePref: 'Nghệ thuật',
+    thumbEmoji: '🎨',
+    dialogue: 'Tiệm mình phối màu hoa đẹp quá trời! Cho tớ đặt một mẫu thật bay bổng nhé!',
+    avatarSvg: `<svg viewBox="0 0 140 180" class="chibi-character">
+      <path d="M42 120 L98 120 L108 175 L32 175 Z" fill="#fef3c7" stroke="#3d200e" stroke-width="3"/>
+      <path d="M56 120 L70 142 L84 120 Z" fill="#e11d48" stroke="#3d200e" stroke-width="2"/>
+      <circle cx="70" cy="74" r="34" fill="#fed7aa" stroke="#3d200e" stroke-width="3.5"/>
+      <path d="M36 66 C36 42 54 38 70 38 C86 38 104 42 104 66 C94 54 84 52 70 52 C56 52 46 54 36 66 Z" fill="#92400e"/>
+      <ellipse cx="74" cy="36" rx="32" ry="14" fill="#e11d48" stroke="#3d200e" stroke-width="3" transform="rotate(-8 74 36)"/>
+      <circle cx="78" cy="22" r="4" fill="#9f1239" stroke="#3d200e" stroke-width="2"/>
+      <ellipse cx="56" cy="74" rx="5" ry="6.5" fill="#1e293b"/>
+      <circle cx="54.5" cy="72" r="2" fill="#ffffff"/>
+      <ellipse cx="84" cy="74" rx="5" ry="6.5" fill="#1e293b"/>
+      <circle cx="82.5" cy="72" r="2" fill="#ffffff"/>
+      <circle cx="48" cy="82" r="5.5" fill="#f43f5e" opacity="0.55"/>
+      <circle cx="92" cy="82" r="5.5" fill="#f43f5e" opacity="0.55"/>
+      <path d="M64 87 Q70 92 76 87" stroke="#3d200e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </svg>`
+  },
+  {
+    id: 'c_cun_sua',
+    name: 'Cậu Cún Sữa',
+    stylePref: 'Ấm áp',
+    thumbEmoji: '🐶',
+    dialogue: 'Gâu gâu~ Tiệm hoa thơm quá đi! Chọn giúp tớ mẫu hoa tươi vui nhất nha!',
+    avatarSvg: `<svg viewBox="0 0 140 180" class="chibi-character">
+      <path d="M40 122 L100 122 L110 175 L30 175 Z" fill="#60a5fa" stroke="#3d200e" stroke-width="3"/>
+      <path d="M58 124 L70 132 L82 124 L79 136 L70 132 L61 136 Z" fill="#ef4444" stroke="#3d200e" stroke-width="2"/>
+      <ellipse cx="34" cy="74" rx="13" ry="24" fill="#b45309" stroke="#3d200e" stroke-width="3" transform="rotate(14 34 74)"/>
+      <ellipse cx="106" cy="74" rx="13" ry="24" fill="#b45309" stroke="#3d200e" stroke-width="3" transform="rotate(-14 106 74)"/>
+      <circle cx="70" cy="74" r="36" fill="#fef3c7" stroke="#3d200e" stroke-width="3.5"/>
+      <ellipse cx="70" cy="83" rx="16" ry="12" fill="#ffffff"/>
+      <circle cx="56" cy="70" r="5.5" fill="#3d200e"/>
+      <circle cx="54.5" cy="68.5" r="2" fill="#ffffff"/>
+      <circle cx="84" cy="70" r="5.5" fill="#3d200e"/>
+      <circle cx="82.5" cy="68.5" r="2" fill="#ffffff"/>
+      <ellipse cx="70" cy="79" rx="5.5" ry="4" fill="#3d200e"/>
+      <path d="M62 85 Q70 91 78 85" stroke="#3d200e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <ellipse cx="70" cy="91" rx="4" ry="4.5" fill="#fb7185"/>
+      <circle cx="46" cy="80" r="5.5" fill="#f43f5e" opacity="0.5"/>
+      <circle cx="94" cy="80" r="5.5" fill="#f43f5e" opacity="0.5"/>
+    </svg>`
+  },
+  {
+    id: 'c_ong_bay',
+    name: 'Ông Bảy - Trà Sư',
+    stylePref: 'Cổ điển',
+    thumbEmoji: '🍵',
+    dialogue: 'Cháu chọn cho ông ít hoa tao nhã để chưng bên bàn trà buổi sáng nhé.',
+    avatarSvg: `<svg viewBox="0 0 140 180" class="chibi-character">
+      <path d="M40 120 L100 120 L110 175 L30 175 Z" fill="#40916c" stroke="#3d200e" stroke-width="3"/>
+      <rect x="65" y="122" width="10" height="53" fill="#d8f3dc" stroke="#3d200e" stroke-width="2"/>
+      <circle cx="70" cy="72" r="34" fill="#fed7aa" stroke="#3d200e" stroke-width="3.5"/>
+      <path d="M36 62 C40 42 56 38 70 38 C84 38 100 42 104 62 L104 54 C96 42 84 36 70 36 C56 36 44 42 36 54 Z" fill="#e2e8f0"/>
+      <ellipse cx="70" cy="36" rx="28" ry="10" fill="#d8a473" stroke="#3d200e" stroke-width="2.5"/>
+      <rect x="48" y="22" width="44" height="14" rx="5" fill="#ab6f3e" stroke="#3d200e" stroke-width="2.5"/>
+      <circle cx="56" cy="70" r="8" fill="none" stroke="#3d200e" stroke-width="2"/>
+      <circle cx="84" cy="70" r="8" fill="none" stroke="#3d200e" stroke-width="2"/>
+      <line x1="64" y1="70" x2="76" y2="70" stroke="#3d200e" stroke-width="2"/>
+      <path d="M52 70 Q56 67 60 70" stroke="#3d200e" stroke-width="2.5" fill="none"/>
+      <path d="M80 70 Q84 67 88 70" stroke="#3d200e" stroke-width="2.5" fill="none"/>
+      <ellipse cx="62" cy="83" rx="9" ry="4.5" fill="#f8fafc" stroke="#3d200e" stroke-width="2"/>
+      <ellipse cx="78" cy="83" rx="9" ry="4.5" fill="#f8fafc" stroke="#3d200e" stroke-width="2"/>
+      <circle cx="46" cy="78" r="5" fill="#f43f5e" opacity="0.45"/>
+      <circle cx="94" cy="78" r="5" fill="#f43f5e" opacity="0.45"/>
+    </svg>`
+  },
+  {
+    id: 'c_nang_dong',
+    name: 'Chị An - Năng Động',
+    stylePref: 'Tươi mới',
+    thumbEmoji: '🧢',
+    dialogue: 'Chào tiệm hoa! Gói giúp mình một mẫu thật rực rỡ tràn đầy năng lượng nhé!',
+    avatarSvg: `<svg viewBox="0 0 140 180" class="chibi-character">
+      <circle cx="98" cy="48" r="14" fill="#451a03" stroke="#3d200e" stroke-width="2.5"/>
+      <path d="M40 120 L100 120 L110 175 L30 175 Z" fill="#34d399" stroke="#3d200e" stroke-width="3"/>
+      <path d="M54 120 Q70 135 86 120" fill="none" stroke="#ffffff" stroke-width="3"/>
+      <circle cx="70" cy="72" r="34" fill="#fed7aa" stroke="#3d200e" stroke-width="3.5"/>
+      <path d="M36 66 C36 42 54 36 70 36 C86 36 104 42 104 66 C94 50 82 46 70 48 C58 46 46 50 36 66 Z" fill="#451a03"/>
+      <path d="M38 48 Q70 34 102 48 L96 30 Q70 22 44 30 Z" fill="#fbbf24" stroke="#3d200e" stroke-width="2.5"/>
+      <ellipse cx="56" cy="72" rx="5" ry="6.5" fill="#1e1b4b"/>
+      <circle cx="54.5" cy="70" r="2" fill="#ffffff"/>
+      <ellipse cx="84" cy="72" rx="5" ry="6.5" fill="#1e1b4b"/>
+      <circle cx="82.5" cy="70" r="2" fill="#ffffff"/>
+      <circle cx="48" cy="80" r="5.5" fill="#f43f5e" opacity="0.55"/>
+      <circle cx="92" cy="80" r="5.5" fill="#f43f5e" opacity="0.55"/>
+      <path d="M62 84 Q70 92 78 84 Z" fill="#f43f5e" stroke="#3d200e" stroke-width="2"/>
+    </svg>`
+  },
+  {
+    id: 'c_gau_mat_ong',
+    name: 'Gấu Mật Ong',
+    stylePref: 'Dễ thương',
+    thumbEmoji: '🧸',
+    dialogue: 'Ùm~ Bạn Gấu muốn mua hoa thơm phức để tặng hội bạn thân cuối tuần nè!',
+    avatarSvg: `<svg viewBox="0 0 140 180" class="chibi-character">
+      <circle cx="38" cy="44" r="14" fill="#d97706" stroke="#3d200e" stroke-width="3"/>
+      <circle cx="38" cy="44" r="7" fill="#fde68a"/>
+      <circle cx="102" cy="44" r="14" fill="#d97706" stroke="#3d200e" stroke-width="3"/>
+      <circle cx="102" cy="44" r="7" fill="#fde68a"/>
+      <path d="M40 120 L100 120 L110 175 L30 175 Z" fill="#b45309" stroke="#3d200e" stroke-width="3"/>
+      <rect x="48" y="118" width="44" height="14" rx="7" fill="#facc15" stroke="#3d200e" stroke-width="2.5"/>
+      <circle cx="70" cy="74" r="36" fill="#d97706" stroke="#3d200e" stroke-width="3.5"/>
+      <ellipse cx="70" cy="82" rx="16" ry="12" fill="#fef3c7"/>
+      <circle cx="55" cy="69" r="5" fill="#3d200e"/>
+      <circle cx="53.5" cy="67.5" r="1.8" fill="#ffffff"/>
+      <circle cx="85" cy="69" r="5" fill="#3d200e"/>
+      <circle cx="83.5" cy="67.5" r="1.8" fill="#ffffff"/>
+      <ellipse cx="70" cy="78" rx="5" ry="3.5" fill="#3d200e"/>
+      <path d="M64 84 Q70 89 76 84" stroke="#3d200e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="46" cy="78" r="6" fill="#f43f5e" opacity="0.55"/>
+      <circle cx="94" cy="78" r="6" fill="#f43f5e" opacity="0.55"/>
+    </svg>`
   }
 ];
 

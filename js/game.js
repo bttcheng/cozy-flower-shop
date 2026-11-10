@@ -2092,7 +2092,10 @@ class FlowerShopGame {
     if (this.state.hour >= 21 || (this.state.hour === 20 && this.state.minute >= 40)) return;
     if (this.state.customersQueue.length >= this.maxQueueLength) return;
 
-    const customerMeta = CUSTOMERS_DATA[Math.floor(Math.random() * CUSTOMERS_DATA.length)];
+    const inQueueIds = new Set(this.state.customersQueue.map(c => c.meta?.id));
+    const availableCustomers = CUSTOMERS_DATA.filter(c => !inQueueIds.has(c.id));
+    const customerPool = availableCustomers.length > 0 ? availableCustomers : CUSTOMERS_DATA;
+    const customerMeta = customerPool[Math.floor(Math.random() * customerPool.length)];
     const vipBonus = this.getUpgradeBonus('vip_signboard');
     const isVip = Math.random() < (vipBonus.vipChance || 0.10);
     const isChoosy = !isVip ? Math.random() < 0.22 : Math.random() < 0.45;
