@@ -772,47 +772,105 @@ const CONTAINER_STYLES_DATA = {
   basket: { id: 'basket', name: 'Giỏ Mây Cắm Hoa', shortName: 'Giỏ Hoa', icon: '🧺', priceAdd: 14 }
 };
 
-// 3. KHÁCH HÀNG MINH HỌA CHIBI DỄ THƯƠNG
+// 3. KHÁCH HÀNG CARTOON CHIBI VẼ TAY CỰC KỲ DỄ THƯƠNG
 const CUSTOMERS_DATA = [
   {
-    id: 'c_sinh_vien',
-    name: 'Minh Khôi - Sinh Viên',
+    id: 'c_meo_mong',
+    name: 'Bé Mèo Mộng',
     stylePref: 'Lãng mạn',
-    thumbEmoji: '🎒',
-    dialogue: 'Chị ơi gói giúp em thật khéo để em mang đi tặng người thương nha!',
-    avatarSvg: `<img src="assets/customers/boy.png" alt="Minh Khôi" class="chibi-character-img" draggable="false">`
+    thumbEmoji: '🐱',
+    dialogue: 'Meo meo~ Cho tớ đặt mẫu hoa thơm lừng thật xinh đem về tặng sen nhé!',
+    avatarSvg: `<svg viewBox="0 0 140 180" class="chibi-character">
+      <ellipse cx="70" cy="145" rx="36" ry="28" fill="#f59e0b" stroke="#3d200e" stroke-width="3"/>
+      <rect x="56" y="125" width="28" height="38" rx="6" fill="#10b981" stroke="#3d200e" stroke-width="2.5"/>
+      <circle cx="50" cy="155" r="9" fill="#fef3c7" stroke="#3d200e" stroke-width="2.5"/>
+      <circle cx="90" cy="155" r="9" fill="#fef3c7" stroke="#3d200e" stroke-width="2.5"/>
+      <circle cx="70" cy="74" r="38" fill="#fef3c7" stroke="#3d200e" stroke-width="3.5"/>
+      <polygon points="40,50 48,20 62,44" fill="#fef3c7" stroke="#3d200e" stroke-width="3"/>
+      <polygon points="45,46 50,26 58,42" fill="#fca5a5"/>
+      <polygon points="100,50 92,20 78,44" fill="#fef3c7" stroke="#3d200e" stroke-width="3"/>
+      <polygon points="95,46 90,26 82,42" fill="#fca5a5"/>
+      <ellipse cx="70" cy="48" rx="10" ry="7" fill="#f59e0b"/>
+      <path d="M52 70 Q60 62 68 70" stroke="#3d200e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M72 70 Q80 62 88 70" stroke="#3d200e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <circle cx="48" cy="78" r="6.5" fill="#f43f5e" opacity="0.6"/>
+      <circle cx="92" cy="78" r="6.5" fill="#f43f5e" opacity="0.6"/>
+      <polygon points="68,78 72,78 70,82" fill="#f43f5e"/>
+      <path d="M64 83 Q70 88 76 83" stroke="#3d200e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <line x1="36" y1="76" x2="48" y2="78" stroke="#3d200e" stroke-width="2"/>
+      <line x1="36" y1="84" x2="48" y2="82" stroke="#3d200e" stroke-width="2"/>
+      <line x1="104" y1="76" x2="92" y2="78" stroke="#3d200e" stroke-width="2"/>
+      <line x1="104" y1="84" x2="92" y2="82" stroke="#3d200e" stroke-width="2"/>
+    </svg>`
   },
   {
-    id: 'c_me_be',
-    name: 'Chị Linh & Bé Bơ',
-    stylePref: 'Ngọt ngào',
-    thumbEmoji: '👶',
-    dialogue: 'Hai mẹ con ghé chọn ít hoa xinh đem về trang trí góc nhà nè!',
-    avatarSvg: `<img src="assets/customers/mom_baby.png" alt="Chị Linh & Bé Bơ" class="chibi-character-img" draggable="false">`
+    id: 'c_co_be_hoa_cuc',
+    name: 'Bé Nấm - Học Sinh',
+    stylePref: 'Dễ thương',
+    thumbEmoji: '🎀',
+    dialogue: 'Dạ chị ơi! Em muốn đặt hoa thật xinh để tặng mẹ ngày sinh nhật!',
+    avatarSvg: `<svg viewBox="0 0 140 180" class="chibi-character">
+      <path d="M42 120 L98 120 L110 175 L30 175 Z" fill="#60a5fa" stroke="#3d200e" stroke-width="3"/>
+      <ellipse cx="70" cy="122" rx="18" ry="8" fill="#ffffff" stroke="#3d200e" stroke-width="2"/>
+      <circle cx="70" cy="72" r="35" fill="#fed7aa" stroke="#3d200e" stroke-width="3.5"/>
+      <circle cx="34" cy="50" r="14" fill="#78350f" stroke="#3d200e" stroke-width="2.5"/>
+      <circle cx="106" cy="50" r="14" fill="#78350f" stroke="#3d200e" stroke-width="2.5"/>
+      <circle cx="34" cy="50" r="4" fill="#fbbf24"/>
+      <circle cx="106" cy="50" r="4" fill="#fbbf24"/>
+      <path d="M38 65 C38 40 55 35 70 35 C85 35 102 40 102 65 C96 52 85 48 70 48 C55 48 44 52 38 65 Z" fill="#78350f"/>
+      <ellipse cx="56" cy="72" rx="5.5" ry="7" fill="#1e1b4b"/>
+      <circle cx="54" cy="70" r="2.2" fill="#ffffff"/>
+      <ellipse cx="84" cy="72" rx="5.5" ry="7" fill="#1e1b4b"/>
+      <circle cx="82" cy="70" r="2.2" fill="#ffffff"/>
+      <circle cx="48" cy="80" r="6" fill="#f43f5e" opacity="0.6"/>
+      <circle cx="92" cy="80" r="6" fill="#f43f5e" opacity="0.6"/>
+      <path d="M64 85 Q70 90 76 85" stroke="#3d200e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </svg>`
   },
   {
-    id: 'c_co_nang_toc_xoan',
-    name: 'Hạ Vy - Nàng Thơ',
-    stylePref: 'Thanh lịch',
-    thumbEmoji: '💜',
-    dialogue: 'Mình mê nhất hương hoa tươi buổi sớm, làm giúp mình kiểu thật tinh tế nhé!',
-    avatarSvg: `<img src="assets/customers/curly_girl.png" alt="Hạ Vy" class="chibi-character-img" draggable="false">`
+    id: 'c_chang_trai_cong_so',
+    name: 'Hoàng - Lãng Tử',
+    stylePref: 'Sang trọng',
+    thumbEmoji: '🕶️',
+    dialogue: 'Shop chọn giúp mình mẫu hoa trang nhã nhất để kỷ niệm 1 năm quen nhau nhé!',
+    avatarSvg: `<svg viewBox="0 0 140 180" class="chibi-character">
+      <path d="M42 120 L98 120 L108 175 L32 175 Z" fill="#b45309" stroke="#3d200e" stroke-width="3"/>
+      <polygon points="70,120 60,145 70,165 80,145" fill="#ffffff" stroke="#3d200e" stroke-width="2"/>
+      <path d="M68 140 L72 140 L71 160 L69 160 Z" fill="#991b1b"/>
+      <circle cx="70" cy="70" r="34" fill="#fcd34d" stroke="#3d200e" stroke-width="3.5"/>
+      <path d="M35 60 C35 32 58 26 72 26 C86 26 105 32 105 60 C98 44 85 38 70 40 C56 38 42 45 35 60 Z" fill="#1e293b"/>
+      <circle cx="56" cy="68" r="9" fill="none" stroke="#3d200e" stroke-width="2.5"/>
+      <circle cx="84" cy="68" r="9" fill="none" stroke="#3d200e" stroke-width="2.5"/>
+      <line x1="65" y1="68" x2="75" y2="68" stroke="#3d200e" stroke-width="2.5"/>
+      <circle cx="56" cy="68" r="3.5" fill="#1e293b"/>
+      <circle cx="84" cy="68" r="3.5" fill="#1e293b"/>
+      <circle cx="48" cy="77" r="5" fill="#f43f5e" opacity="0.5"/>
+      <circle cx="92" cy="77" r="5" fill="#f43f5e" opacity="0.5"/>
+      <path d="M64 84 Q70 89 76 84" stroke="#3d200e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </svg>`
   },
   {
-    id: 'c_ba_ngoai',
-    name: 'Bà Ngoại Hiền Hậu',
+    id: 'c_quy_ba_thanh_lich',
+    name: 'Bà Phương - Quý Phái',
     stylePref: 'Trang nhã',
-    thumbEmoji: '👵',
-    dialogue: 'Bà chọn chút hoa tươi để cắm bàn trà chiều cùng con cháu đây.',
-    avatarSvg: `<img src="assets/customers/grandma.png" alt="Bà Ngoại" class="chibi-character-img" draggable="false">`
-  },
-  {
-    id: 'c_gia_dinh',
-    name: 'Ông Ngoại & Gia Đình',
-    stylePref: 'Ấm áp',
-    thumbEmoji: '🌻',
-    dialogue: 'Cả nhà mình cùng đi dạo ghé tiệm mua hoa chúc mừng cuối tuần!',
-    avatarSvg: `<img src="assets/customers/grandpa_family.png" alt="Ông Ngoại & Gia Đình" class="chibi-character-img wide-cust" draggable="false">`
+    thumbEmoji: '👑',
+    dialogue: 'Tôi cần đặt hoa thật thanh tao để trang trí phòng khách cuối tuần.',
+    avatarSvg: `<svg viewBox="0 0 140 180" class="chibi-character">
+      <path d="M42 118 L98 118 L110 175 L30 175 Z" fill="#9333ea" stroke="#3d200e" stroke-width="3"/>
+      <circle cx="62" cy="126" r="3" fill="#ffffff" stroke="#3d200e" stroke-width="1"/>
+      <circle cx="70" cy="129" r="3.5" fill="#ffffff" stroke="#3d200e" stroke-width="1"/>
+      <circle cx="78" cy="126" r="3" fill="#ffffff" stroke="#3d200e" stroke-width="1"/>
+      <ellipse cx="70" cy="35" rx="22" ry="16" fill="#334155" stroke="#3d200e" stroke-width="3"/>
+      <circle cx="70" cy="72" r="33" fill="#fed7aa" stroke="#3d200e" stroke-width="3.5"/>
+      <path d="M38 65 C38 46 55 42 70 42 C85 42 102 46 102 65 C96 55 85 52 70 52 C55 52 44 55 38 65 Z" fill="#334155"/>
+      <circle cx="36" cy="75" r="4" fill="#ffffff" stroke="#3d200e" stroke-width="1.5"/>
+      <circle cx="104" cy="75" r="4" fill="#ffffff" stroke="#3d200e" stroke-width="1.5"/>
+      <path d="M52 68 Q58 64 64 68" stroke="#3d200e" stroke-width="3" fill="none"/>
+      <path d="M76 68 Q82 64 88 68" stroke="#3d200e" stroke-width="3" fill="none"/>
+      <circle cx="48" cy="76" r="5" fill="#f43f5e" opacity="0.6"/>
+      <circle cx="92" cy="76" r="5" fill="#f43f5e" opacity="0.6"/>
+      <path d="M64 83 Q70 88 76 83" stroke="#a21caf" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </svg>`
   }
 ];
 

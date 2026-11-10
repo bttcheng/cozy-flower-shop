@@ -2184,9 +2184,13 @@ class FlowerShopGame {
       };
     }
 
-    // 2. ĐƠN THƯỜNG / VIP / KHÁCH KHÓ TÍNH / ĐƠN GẤP (CHỌN NGẪU NHIÊN BÓ NÓN / HỘP TRÒN / GIỎ HOA)
-    const styleRoll = Math.random();
-    const containerType = styleRoll < 0.42 ? 'cone' : (styleRoll < 0.74 ? 'box' : 'basket');
+    // 2. ĐƠN THƯỜNG / VIP / KHÁCH KHÓ TÍNH / ĐƠN GẤP (LUÂN PHIÊN ĐA DẠNG: BÓ NÓN / HỘP TRÒN / GIỎ HOA)
+    const allContainerTypes = ['cone', 'box', 'basket'];
+    const poolTypes = this.lastOrderContainerType
+      ? allContainerTypes.filter(t => t !== this.lastOrderContainerType)
+      : allContainerTypes;
+    const containerType = poolTypes[Math.floor(Math.random() * poolTypes.length)];
+    this.lastOrderContainerType = containerType;
     const stylePriceAdd = (typeof CONTAINER_STYLES_DATA !== 'undefined' && CONTAINER_STYLES_DATA[containerType])
       ? CONTAINER_STYLES_DATA[containerType].priceAdd
       : 0;
